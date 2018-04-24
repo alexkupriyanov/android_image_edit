@@ -58,6 +58,7 @@
         android:layout_marginEnd="52dp"
         android:layout_marginTop="8dp"
         android:background="@color/colorPrimaryDark"
+        android:onClick="nni"
         android:text="WTF???"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button2"

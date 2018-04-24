@@ -1,5 +1,6 @@
 package com.example.lbg99.andrapp
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -13,15 +14,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
-    fun testtt(view: View)
-    {
-        val Testt=Toast.makeText(this,"PLS, HELP!!!", Toast.LENGTH_SHORT)
+
+    fun testtt(view: View) {
+        val Testt = Toast.makeText(this, "PLS, HELP!!!", Toast.LENGTH_SHORT)
         Testt.show()
     }
-    fun fix(view: View)
-    {
+
+    fun fix(view: View) {
         val str = textView.text.toString()
         val cnt = Random()
         textView.text = cnt.nextInt().toString()
+    }
+
+    fun nni(view: View) {
+        val ni = Intent(this, Main2Activity::class.java)
+        val count = textView.text.toString()
+        val test = Integer.parseInt(count)
+        ni.putExtra(Main2Activity.TOTAL_COUNT,test)
+        startActivity(ni)
     }
 }
