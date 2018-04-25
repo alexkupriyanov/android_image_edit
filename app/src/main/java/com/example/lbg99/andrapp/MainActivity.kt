@@ -21,9 +21,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun fix(view: View) {
-        val str = textView.text.toString()
         val cnt = Random()
-        textView.text = cnt.nextInt().toString()
+        button1.text = cnt.nextInt().toString()
     }
 
     fun nni(view: View) {
