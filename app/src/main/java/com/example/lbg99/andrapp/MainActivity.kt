@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     fun testtt(view: View) {
         val Testt = Toast.makeText(this, "PLS, HELP!!!", Toast.LENGTH_SHORT)
         Testt.show()
+        val ni = Intent(this,Main3Activity::class.java)
+        startActivity(ni)
     }
 
     fun fix(view: View) {
