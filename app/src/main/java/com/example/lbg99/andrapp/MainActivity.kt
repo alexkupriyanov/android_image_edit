@@ -3,11 +3,19 @@ package com.example.lbg99.andrapp
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import android.R.attr.bitmap
+import android.annotation.TargetApi
+import android.os.Build
+import android.support.annotation.RequiresApi
+import java.io.IOException
+
+
 class MainActivity : AppCompatActivity() {
     private val CAMERA_REQUEST_CODE = 0
     private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
@@ -29,9 +37,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        var bitmap: Bitmap? = null
         when(requestCode) {
             CAMERA_REQUEST_CODE -> {
                 if(resultCode == Activity.RESULT_OK && data != null) {
@@ -39,8 +48,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             REQUEST_SELECT_IMAGE_IN_ALBUM -> {
-                if(resultCode == Activity.RESULT_OK && data != null) {
-                    photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
+                if (resultCode === Activity.RESULT_OK) {
+                    val selectedImage = data?.getData()
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    photoImageView.setImageBitmap(bitmap)
                 }
             }
             else ->  {
