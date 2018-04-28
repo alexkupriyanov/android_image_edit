@@ -14,6 +14,10 @@ import android.annotation.TargetApi
 import android.os.Build
 import android.support.annotation.RequiresApi
 import java.io.IOException
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.view.View
+import com.example.lbg99.andrapp.R.id.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -63,4 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    fun countMe (view: View) {
+        val randomIntent = Intent(this, Bin::class.java)
+        startActivity(randomIntent)
+    }
+
 }

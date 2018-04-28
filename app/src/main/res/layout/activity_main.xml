@@ -30,7 +30,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/galeryBtn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photoImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/photoImageView"
+        app:layout_constraintVertical_bias="0.512" />
 
     <Button
         android:id="@+id/galeryBtn"
@@ -46,5 +47,15 @@
         app:layout_constraintStart_toEndOf="@+id/cameraBtn"
         app:layout_constraintTop_toBottomOf="@+id/photoImageView"
         app:layout_constraintVertical_bias="0.512" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="58dp"
+        android:layout_height="33dp"
+        android:text="Button"
+        android:onClick="countMe"
+        tools:layout_editor_absoluteX="163dp"
+        tools:layout_editor_absoluteY="406dp"
+        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>
