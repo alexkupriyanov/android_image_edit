@@ -1,81 +1,38 @@
 package com.example.lbg99.andrapp
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.Bundle
-import android.os.Environment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.view.View
-import android.widget.ImageView
-import java.io.File
-
-
+import android.os.Bundle
+import android.provider.MediaStore
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
-
-    var mImageView: ImageView? = null
+    val CAMERA_REQUEST_CODE = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main)
-        mImageView = findViewById<View>(R.id.imageView) as ImageView
-        logMemory()
-        readImage()
-        logMemory()
-    }
-
-    private fun readImage() {
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "map.jpg")
-        val bitmap = BitmapFactory.decodeFile(file.getAbsolutePath())
-        Log.d("log", String.format("bitmap size = %sx%s, byteCount = %s",
-                bitmap.width, bitmap.height,
-                bitmap.byteCount / 1024))
-        mImageView!!.setImageBitmap(bitmap)
-    }
-
-    private fun logMemory() {
-        Log.i("log", String.format("Total memory = %s",
-                (Runtime.getRuntime().totalMemory() / 1024).toInt()))
-    }
-
-    fun decodeSampledBitmapFromResource(path: String,
-                                        reqWidth: Int, reqHeight: Int): Bitmap {
-
-        // Читаем с inJustDecodeBounds=true для определения размеров
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(path, options)
-
-        // Вычисляем inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth,
-                reqHeight)
-
-        // Читаем с использованием inSampleSize коэффициента
-        options.inJustDecodeBounds = false
-        options.inPreferredConfig = Bitmap.Config.RGB_565
-        return BitmapFactory.decodeFile(path, options)
-    }
-
-    fun calculateInSampleSize(options: BitmapFactory.Options,
-                              reqWidth: Int, reqHeight: Int): Int {
-        // Реальные размеры изображения
-        val height = options.outHeight
-        val width = options.outWidth
-        var inSampleSize = 1
-
-        if (height > reqHeight || width > reqWidth) {
-
-            val halfHeight = height / 2
-            val halfWidth = width / 2
-
-            // Вычисляем наибольший inSampleSize, который будет кратным двум
-            // и оставит полученные размеры больше, чем требуемые
-            while (halfHeight / inSampleSize > reqHeight && halfWidth / inSampleSize > reqWidth) {
-                inSampleSize *= 2
+        setContentView(R.layout.activity_main)
+        cameraBtn.setOnClickListener {
+            val callCamerIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if(callCamerIntent.resolveActivity(packageManager) != null){
+                startActivityForResult(callCamerIntent,CAMERA_REQUEST_CODE)
             }
         }
-
-        return inSampleSize
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
+        when(requestCode) {
+            CAMERA_REQUEST_CODE -> {
+                if(resultCode == Activity.RESULT_OK && data != null) {
+                    photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
+                }
+            }
+            else ->  {
+                Toast.makeText(this, "Unrecognized request code", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 }
