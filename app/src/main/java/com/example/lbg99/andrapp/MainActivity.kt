@@ -11,65 +11,104 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import android.R.attr.bitmap
 import android.annotation.TargetApi
-import android.os.Build
-import android.support.annotation.RequiresApi
-import java.io.IOException
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.view.View
-import com.example.lbg99.andrapp.R.id.*
+import android.os.Build
+import android.os.Environment
+import android.support.annotation.RequiresApi
+import java.io.File
+import java.io.IOException
+import android.os.Environment.DIRECTORY_PICTURES
+import android.support.v4.content.FileProvider
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import android.widget.ImageView
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val CAMERA_REQUEST_CODE = 0
-    private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
+    val REQUEST_IMAGE_CAPTURE = 1
+    val REQUEST_TAKE_PHOTO = 0
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+    var mCurrentPhotoPath: String? = null
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+                imageFileName, /* prefix */
+                ".jpg", /* suffix */
+                storageDir      /* directory */
+        )
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.absolutePath
+        return image
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         cameraBtn.setOnClickListener {
-            val callCamerIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if(callCamerIntent.resolveActivity(packageManager) != null) {
-                startActivityForResult(callCamerIntent,CAMERA_REQUEST_CODE)
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                var photoFile: File? = null
+                try {
+                    photoFile = createImageFile();
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                if (photoFile != null) {
+                    val photoURI = FileProvider.getUriForFile(this,
+                            "com.example.android.fileprovider",
+                            photoFile)
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
+                }
             }
         }
         galeryBtn.setOnClickListener {
-            val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
-            callGalleryIntent.type = "image/*"
-            if(callGalleryIntent.resolveActivity(packageManager)!=null) {
-                startActivityForResult(callGalleryIntent,REQUEST_SELECT_IMAGE_IN_ALBUM)
-            }
+            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+            val f = File(mCurrentPhotoPath)
+            val contentUri = Uri.fromFile(f)
+            mediaScanIntent.data = contentUri
+            this.sendBroadcast(mediaScanIntent)
         }
     }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        var bitmap: Bitmap? = null
-        when(requestCode) {
-            CAMERA_REQUEST_CODE -> {
-                if(resultCode == Activity.RESULT_OK && data != null) {
-                    photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
-                }
-            }
-            REQUEST_SELECT_IMAGE_IN_ALBUM -> {
-                if (resultCode === Activity.RESULT_OK) {
-                    val selectedImage = data?.getData()
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                    photoImageView.setImageBitmap(bitmap)
-                }
-            }
-            else ->  {
-                Toast.makeText(this, "Unrecognized request code", Toast.LENGTH_SHORT).show()
-            }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val extras = data.extras
+            val imageBitmap = extras!!.get("data") as Bitmap
+            photoImageView.setImageBitmap(imageBitmap)
         }
     }
-    fun countMe (view: View) {
-        val randomIntent = Intent(this, Bin::class.java)
-        startActivity(randomIntent)
-    }
+    private fun setPic(imagePath: String) {
 
+        val bitmap = BitmapFactory.decodeFile(imagePath)
+        val width = bitmap.width
+        val height = bitmap.height
+        val size = width * height
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
+        val photoW = bmOptions.outWidth
+        val photoH = bmOptions.outHeight
+
+        // Determine how much to scale down the image
+        val scaleFactor = Math.min(photoW / width, photoH / height)
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false
+        bmOptions.inSampleSize = scaleFactor
+        bmOptions.inPurgeable = true
+        photoImageView.setImageBitmap(bitmap)
+    }
 }

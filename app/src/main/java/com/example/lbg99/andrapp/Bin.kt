@@ -13,7 +13,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
-class Bin : AppCompatActivity() {
+/*class Bin : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,5 +38,8 @@ class Bin : AppCompatActivity() {
         }
 
         Utils.saveBitmap(imagePath, width, height, pixels)
+
     }
+
 }
+*/
