@@ -19,7 +19,6 @@ class Bin : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bin)
     }
-
     fun binarizeByThreshold(imagePath: String, threshold: Int) {
         val bitmap = BitmapFactory.decodeFile(imagePath)
         val width = bitmap.width
