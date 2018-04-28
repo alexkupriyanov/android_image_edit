@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AndrApp</string>
+    <string name="get_photo">Get photo</string>
+    <string name="get_image">Get image</string>
 </resources>

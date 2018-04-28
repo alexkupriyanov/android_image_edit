@@ -9,14 +9,22 @@ import android.provider.MediaStore
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
-    val CAMERA_REQUEST_CODE = 0
+    private val CAMERA_REQUEST_CODE = 0
+    private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         cameraBtn.setOnClickListener {
             val callCamerIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if(callCamerIntent.resolveActivity(packageManager) != null){
+            if(callCamerIntent.resolveActivity(packageManager) != null) {
                 startActivityForResult(callCamerIntent,CAMERA_REQUEST_CODE)
+            }
+        }
+        galeryBtn.setOnClickListener {
+            val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
+            callGalleryIntent.type = "image/*"
+            if(callGalleryIntent.resolveActivity(packageManager)!=null) {
+                startActivityForResult(callGalleryIntent,REQUEST_SELECT_IMAGE_IN_ALBUM)
             }
         }
     }
@@ -26,6 +34,11 @@ class MainActivity : AppCompatActivity() {
 
         when(requestCode) {
             CAMERA_REQUEST_CODE -> {
+                if(resultCode == Activity.RESULT_OK && data != null) {
+                    photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
+                }
+            }
+            REQUEST_SELECT_IMAGE_IN_ALBUM -> {
                 if(resultCode == Activity.RESULT_OK && data != null) {
                     photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
                 }
