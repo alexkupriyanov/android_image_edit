@@ -24,6 +24,10 @@ import android.opengl.ETC1.getWidth
 import android.widget.ImageView
 import java.text.SimpleDateFormat
 import java.util.*
+import android.R.attr.data
+import android.support.v4.app.NotificationCompat.getExtras
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -74,37 +78,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        galeryBtn.setOnClickListener {
-            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-            val f = File(mCurrentPhotoPath)
-            val contentUri = Uri.fromFile(f)
-            mediaScanIntent.data = contentUri
-            this.sendBroadcast(mediaScanIntent)
-        }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        super.onActivityResult(requestCode, resultCode, data)
-        var bitmap: Bitmap? = null
-        when(requestCode) {
-            REQUEST_TAKE_PHOTO -> {
-                if(resultCode == Activity.RESULT_OK && data != null) {
-                    photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
-                }
-            }
-            REQUEST_IMAGE_CAPTURE -> {
-                if (resultCode === Activity.RESULT_OK) {
-                    val selectedImage = data?.getData()
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                    photoImageView.setImageBitmap(bitmap)
-                }
-            }
-            else ->  {
-                Toast.makeText(this, "Unrecognized request code", Toast.LENGTH_SHORT).show()
-            }
+        if (requestCode === REQUEST_TAKE_PHOTO && resultCode === Activity.RESULT_OK) {
+            val extras = data.extras
+            val imageBitmap = extras.get("data") as Bitmap
+            photoImageView.setImageBitmap(imageBitmap)
         }
     }
 
