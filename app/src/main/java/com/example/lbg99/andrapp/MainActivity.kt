@@ -39,9 +39,8 @@ class MainActivity : AppCompatActivity() {
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val imageFileName="mypic"
+        val storageDir=getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val image = File.createTempFile(
                 imageFileName, /* prefix */
                 ".jpg", /* suffix */
@@ -84,31 +83,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val extras = data.extras
-            val imageBitmap = extras!!.get("data") as Bitmap
-            photoImageView.setImageBitmap(imageBitmap)
+        super.onActivityResult(requestCode, resultCode, data)
+        var bitmap: Bitmap? = null
+        when(requestCode) {
+            REQUEST_TAKE_PHOTO -> {
+                if(resultCode == Activity.RESULT_OK && data != null) {
+                    photoImageView.setImageBitmap(data.extras.get("data") as Bitmap)
+                }
+            }
+            REQUEST_IMAGE_CAPTURE -> {
+                if (resultCode === Activity.RESULT_OK) {
+                    val selectedImage = data?.getData()
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImage)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    photoImageView.setImageBitmap(bitmap)
+                }
+            }
+            else ->  {
+                Toast.makeText(this, "Unrecognized request code", Toast.LENGTH_SHORT).show()
+            }
         }
     }
-    private fun setPic(imagePath: String) {
 
-        val bitmap = BitmapFactory.decodeFile(imagePath)
-        val width = bitmap.width
-        val height = bitmap.height
-        val size = width * height
-        val bmOptions = BitmapFactory.Options()
-        bmOptions.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
-        val photoW = bmOptions.outWidth
-        val photoH = bmOptions.outHeight
 
-        // Determine how much to scale down the image
-        val scaleFactor = Math.min(photoW / width, photoH / height)
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false
-        bmOptions.inSampleSize = scaleFactor
-        bmOptions.inPurgeable = true
-        photoImageView.setImageBitmap(bitmap)
-    }
 }
