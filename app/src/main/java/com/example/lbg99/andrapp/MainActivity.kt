@@ -33,12 +33,6 @@ import android.support.v4.app.NotificationCompat.getExtras
 class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 0
-    private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-        }
-    }
     var mCurrentPhotoPath: String? = null
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -65,12 +59,13 @@ class MainActivity : AppCompatActivity() {
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 var photoFile: File? = null
                 try {
-                    photoFile = createImageFile();
+                    photoFile = createImageFile()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
                 if (photoFile != null) {
-                    val photoURI = FileProvider.getUriForFile(this,
+
+                    val photoURI  = FileProvider.getUriForFile(this,
                             "com.example.android.fileprovider",
                             photoFile)
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
