@@ -95,46 +95,21 @@ class MainActivity : AppCompatActivity() {
         }
        sepBtn.setOnClickListener {
         var matrix = getPixels()
-           var bmp: Bitmap? = null
            for (i in 0 until matrix!!.size) {
-           var p = matrix[i]
-               val a = p shr 24 and 0xff
-               var r = p shr 16 and 0xff
-               var g = p shr 8 and 0xff
-               var b = p and 0xff
+               val color = matrix[i]
+               val r = 255-Color.red(color)
+               val g = 255-Color.green(color)
+               val b = 255-Color.blue(color)
 
-               //calculate tr, tg, tb
-               val tr = (0.393 * r + 0.769 * g + 0.189 * b).toInt()
-               val tg = (0.349 * r + 0.686 * g + 0.168 * b).toInt()
-               val tb = (0.272 * r + 0.534 * g + 0.131 * b).toInt()
+               matrix[i] = colorToInt(r,g,b)
+           }
+           var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
+           tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
+           photoImageView.setImageBitmap(tmp)
 
-
-                //Fix values
-               if(tr > 255){
-                   r = 255;
-               }else{
-                   r = tr;
-               }
-
-               if(tg > 255){
-                   g = 255;
-               }else{
-                   g = tg;
-               }
-
-               if(tb > 255){
-                   b = 255;
-               }else{
-                   b = tb;
-               }
-               var tmp: Bitmap?  = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
-               tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
-bmp=tmp
         }
 
-        photoImageView.setImageBitmap(bmp)
 
-    }
     }
 
 
