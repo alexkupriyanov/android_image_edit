@@ -37,6 +37,10 @@ import android.os.Build.VERSION_CODES.M
 import android.view.View.Y
 import com.example.lbg99.andrapp.R.id.*
 
+import android.view.View.Y
+
+
+
 
 class MainActivity : AppCompatActivity() {
     private var tpmImage: Bitmap? = null
@@ -110,41 +114,45 @@ class MainActivity : AppCompatActivity() {
 
         }
         whitebutton.setOnClickListener {
-            var maxR = 1.0
-            var maxG = 1.0
-            var maxB = 1.0
+            var r: Int
+            var g: Int
+            var b: Int
+            var Y: Double
+            var I: Double
+            var Q: Double
+
             var matrix = getPixels()
-            for (i in 0 until matrix!!.size) {
-                val color = matrix[i]
-                val r = Color.red(color)
-                val g = Color.green(color)
-                val b = Color.blue(color)
-                if (r > maxR)
-                    maxR = r.toDouble()
 
-                if (g > maxG)
-                    maxG = g.toDouble()
-
-                if (b > maxB)
-                    maxB = b.toDouble()
-
-
-            }
-            maxR = 255.0 / maxR
-            maxG = 255.0 / maxG
-            maxB = 255.0 / maxB
             for (i in 0 until matrix!!.size)
             {
                 val color = matrix[i]
-                var r = maxR*Color.red(color)
-                var g =  maxG*Color.green(color)
-                var b = maxB*Color.blue(color)
-                if (r > 255) r = 255.0
-                if (g > 255) g = 255.0
-                if (b > 255) b = 255.0
+                 r = Color.red(color)
+                 g =  Color.green(color)
+                 b =Color.blue(color)
+                Y = 0.299 * r + 0.587 * g + 0.114 * b
+                //I = (0.596 * r) - (0.274 * g) - (0.322 * b);
+                //Q = (0.212 * r) - (0.523 * g) + (0.311 * b);
 
+                //Update it
+                I = 51.0
+                Q = 0.0
+
+                //Transform to RGB
+                r = (1.0 * Y + 0.956 * I + 0.621 * Q).toInt()
+                g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
+                b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
+
+                //Fix values
+                r = if (r < 0) 0 else r
+                r = if (r > 255) 255 else r
+
+                g = if (g < 0) 0 else g
+                g = if (g > 255) 255 else g
+
+                b = if (b < 0) 0 else b
+                b = if (b > 255) 255 else b
                 val a=255
-                val p = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
+                val p = a shl 24 or (r shl 16) or (g shl 8) or b
                 matrix[i] = p
             }
 
