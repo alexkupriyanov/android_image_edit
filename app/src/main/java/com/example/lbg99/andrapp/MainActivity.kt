@@ -94,14 +94,15 @@ class MainActivity : AppCompatActivity() {
 
         }
        sepBtn.setOnClickListener {
-        var matrix = getPixels()
+            var matrix = getPixels()
            for (i in 0 until matrix!!.size) {
                val color = matrix[i]
                val r = 255-Color.red(color)
                val g = 255-Color.green(color)
                val b = 255-Color.blue(color)
-
-               matrix[i] = colorToInt(r,g,b)
+               val a=255
+               val p = a shl 24 or (r shl 16) or (g shl 8) or b
+               matrix[i] = p
            }
            var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
            tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
