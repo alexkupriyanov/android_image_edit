@@ -109,6 +109,50 @@ class MainActivity : AppCompatActivity() {
            photoImageView.setImageBitmap(tmp)
 
         }
+        whitebutton.setOnClickListener {
+            var maxR = 1.0
+            var maxG = 1.0
+            var maxB = 1.0
+            var matrix = getPixels()
+            for (i in 0 until matrix!!.size) {
+                val color = matrix[i]
+                val r = Color.red(color)
+                val g = Color.green(color)
+                val b = Color.blue(color)
+                if (r > maxR)
+                    maxR = r.toDouble()
+
+                if (g > maxG)
+                    maxG = g.toDouble()
+
+                if (b > maxB)
+                    maxB = b.toDouble()
+
+
+            }
+            maxR = 255.0 / maxR
+            maxG = 255.0 / maxG
+            maxB = 255.0 / maxB
+            for (i in 0 until matrix!!.size)
+            {
+                val color = matrix[i]
+                var r = maxR*Color.red(color)
+                var g =  maxG*Color.green(color)
+                var b = maxB*Color.blue(color)
+                if (r > 255) r = 255.0
+                if (g > 255) g = 255.0
+                if (b > 255) b = 255.0
+
+                val a=255
+                val p = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
+                matrix[i] = p
+            }
+
+            var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
+            tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
+            photoImageView.setImageBitmap(tmp)
+
+        }
 
 
     }
