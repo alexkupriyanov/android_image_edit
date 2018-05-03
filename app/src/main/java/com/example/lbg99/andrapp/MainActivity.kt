@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
            photoImageView.setImageBitmap(tmp)
 
         }
-        whitebutton.setOnClickListener {
+        sepiabutton.setOnClickListener {
             var r: Int
             var g: Int
             var b: Int

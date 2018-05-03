@@ -79,14 +79,14 @@
         app:layout_constraintTop_toBottomOf="@+id/binBtn" />
 
     <Button
-        android:id="@+id/whitebutton"
+        android:id="@+id/sepiabutton"
         android:layout_width="50dp"
         android:layout_height="41dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="white"
+        android:text="sepia"
         app:layout_constraintBottom_toBottomOf="@+id/binBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
