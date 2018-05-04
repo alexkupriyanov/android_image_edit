@@ -71,17 +71,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
         galeryBtn.setOnClickListener {
-            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-            val f = File(mCurrentPhotoPath)
-            val contentUri = Uri.fromFile(f)
-            mediaScanIntent.data = contentUri
-            this.sendBroadcast(mediaScanIntent)
+            val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
+            callGalleryIntent.type = "image/*"
+            if(callGalleryIntent.resolveActivity(packageManager)!=null) {
+                    startActivityForResult(callGalleryIntent,REQUEST_IMAGE_CAPTURE)
+                }
         }
+
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val extras = data?.extras
-            val imageBitmap = extras!!.get("data") as Bitmap
+            val selectedImage = data?.data
+            val imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
             photoImageView.setImageBitmap(imageBitmap)
 
         }
