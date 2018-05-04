@@ -28,7 +28,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
-    val REQUEST_TAKE_PHOTO = 0
+    val REQUEST_TAKE_PHOTO = 2
     private fun dispatchTakePictureIntent() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(packageManager) != null) {
@@ -62,13 +62,14 @@ class MainActivity : AppCompatActivity() {
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 var photoFile: File? = null
                 try {
-                    photoFile = createImageFile();
+                    photoFile = createImageFile()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
                 if (photoFile != null) {
+                    val auth: String  = packageName + ".fileprovider"
                     val photoURI = FileProvider.getUriForFile(this,
-                            "com.example.android.fileprovider",
+                            auth,
                             photoFile)
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
@@ -83,32 +84,19 @@ class MainActivity : AppCompatActivity() {
             this.sendBroadcast(mediaScanIntent)
         }
     }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val extras = data.extras
-            val imageBitmap = extras!!.get("data") as Bitmap
-            photoImageView.setImageBitmap(imageBitmap)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(data != null) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+                val extras = data.extras
+                val imageBitmap = extras!!.get("data") as Bitmap
+                photoImageView.setImageBitmap(imageBitmap)
+
+            }
+            if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+                val extras = data.extras
+                val imageBitmap = extras!!.get("data") as Bitmap
+                photoImageView.setImageBitmap(imageBitmap)
+            }
         }
-    }
-    private fun setPic(imagePath: String) {
-
-        val bitmap = BitmapFactory.decodeFile(imagePath)
-        val width = bitmap.width
-        val height = bitmap.height
-        val size = width * height
-        val bmOptions = BitmapFactory.Options()
-        bmOptions.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
-        val photoW = bmOptions.outWidth
-        val photoH = bmOptions.outHeight
-
-        // Determine how much to scale down the image
-        val scaleFactor = Math.min(photoW / width, photoH / height)
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false
-        bmOptions.inSampleSize = scaleFactor
-        bmOptions.inPurgeable = true
-        photoImageView.setImageBitmap(bitmap)
     }
 }
