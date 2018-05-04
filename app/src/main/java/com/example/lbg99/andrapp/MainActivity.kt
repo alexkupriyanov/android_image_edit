@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import android.R.attr.bitmap
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -22,14 +23,20 @@ import android.support.v4.content.FileProvider
 import android.opengl.ETC1.getHeight
 import android.opengl.ETC1.getWidth
 import android.widget.ImageView
+import com.example.lbg99.andrapp.R.attr.logo
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import android.graphics.drawable.BitmapDrawable
+
+
 
 
 class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
+    public var imageBitmap: Bitmap?=null
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -46,8 +53,7 @@ class MainActivity : AppCompatActivity() {
         mCurrentPhotoPath = image.absolutePath
         return image
     }
-
-
+    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,17 +83,36 @@ class MainActivity : AppCompatActivity() {
                     startActivityForResult(callGalleryIntent,REQUEST_IMAGE_CAPTURE)
                 }
         }
-
+        imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+        saveBtn.setOnClickListener {
+            val root = Environment.getExternalStorageDirectory().toString()
+            val myDir = File(root + "/capture_photo")
+            myDir.mkdirs()
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+            val OutletFname = "Image-$timeStamp.jpg"
+            val file = File(myDir, OutletFname)
+            if (file.exists()) file.delete()
+            try {
+                val out = FileOutputStream(file)
+                imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+                imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                out.flush()
+                out.close()
+                Toast.makeText(this,"Save complete!",Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
-            val imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
+            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
             photoImageView.setImageBitmap(imageBitmap)
 
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            val imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
             photoImageView.setImageBitmap(imageBitmap)
         }
     }
