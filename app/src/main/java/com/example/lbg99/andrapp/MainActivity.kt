@@ -29,12 +29,6 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
-    private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-        }
-    }
     var mCurrentPhotoPath: String? = null
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -85,18 +79,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(data != null) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-                val extras = data.extras
-                val imageBitmap = extras!!.get("data") as Bitmap
-                photoImageView.setImageBitmap(imageBitmap)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val extras = data?.extras
+            val imageBitmap = extras!!.get("data") as Bitmap
+            photoImageView.setImageBitmap(imageBitmap)
 
-            }
-            if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-                val extras = data.extras
-                val imageBitmap = extras!!.get("data") as Bitmap
-                photoImageView.setImageBitmap(imageBitmap)
-            }
+        }
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            val imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            photoImageView.setImageBitmap(imageBitmap)
         }
     }
 }
