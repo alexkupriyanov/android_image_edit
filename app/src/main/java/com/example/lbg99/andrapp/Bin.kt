@@ -1,45 +1,40 @@
 package com.example.lbg99.andrapp
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
-import android.graphics.BitmapFactory
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.content.Context
+import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.Button
+import android.widget.ImageView
 
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
+import android.R.id.button1
+import android.R.id.button2
+import com.example.lbg99.andrapp.R
+import com.example.lbg99.andrapp.R.layout.activity_main
 
-/*class Bin : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
+    internal var iv: ImageView
+    internal var btn1: Button
+    internal var btn2: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_bin)
-    }
-    fun binarizeByThreshold(imagePath: String, threshold: Int) {
-        val bitmap = BitmapFactory.decodeFile(imagePath)
-        val width = bitmap.width
-        val height = bitmap.height
-        val size = width * height
-        val pixels = IntArray(size)
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-        bitmap.recycle()
+        setContentView(R.layout.activity_main)
 
-        for (i in 0 until size) {
-            val color = pixels[i]
-            val r = Color.red(color)
-            val g = Color.green(color)
-            val b = Color.blue(color)
-            val luminance = 0.299 * r + 0.0 + 0.587 * g + 0.0 + 0.114 * b + 0.0
-            pixels[i] = if (luminance > threshold) Color.WHITE else Color.BLACK
-        }
+        iv = findViewById<View>(R.id.imageView) as ImageView
+        btn1 = findViewById<View>(R.id.button1) as Button
+        btn2 = findViewById<View>(R.id.button2) as Button
 
-        Utils.saveBitmap(imagePath, width, height, pixels)
+        btn1.setOnClickListener {
+            val anim = AnimationUtils.loadAnimation(applicationContext, R.anim.clockwise)
+            iv.startAnimation(anim)
+        }//btn1
 
-    }
+        btn2.setOnClickListener {
+            val anim = AnimationUtils.loadAnimation(applicationContext, R.anim.anticlockwise)
+            iv.startAnimation(anim)
+        }//btn2
 
+    }//onCfreate
 }
-*/
