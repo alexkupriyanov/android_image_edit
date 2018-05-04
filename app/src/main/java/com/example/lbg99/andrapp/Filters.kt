@@ -10,7 +10,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_filters.*
 import java.io.IOException
-import com.example.lbg99.andrapp.Filters.photoImageView
+
 
 
 class Filters :AppCompatActivity() {
@@ -35,12 +35,6 @@ class Filters :AppCompatActivity() {
         return pixels
     }
 
-    companion object {
-
-        const val CAMERA_REQUEST_CODE = "total_count"
-        const val REQUEST_SELECT_IMAGE_IN_ALBUM = "total_count"
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +52,7 @@ class Filters :AppCompatActivity() {
             }
             var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
-            photoImageView.setImageBitmap(tmp)
+            Image.setImageBitmap(tmp)
 
         }
         inversBtn.setOnClickListener {
@@ -74,7 +68,7 @@ class Filters :AppCompatActivity() {
             }
             var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
-            photoImageView.setImageBitmap(tmp)
+            Image.setImageBitmap(tmp)
 
         }
 
@@ -121,7 +115,7 @@ class Filters :AppCompatActivity() {
 
             var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
-            photoImageView.setImageBitmap(tmp)
+            Image.setImageBitmap(tmp)
 
         }
 
@@ -168,7 +162,7 @@ class Filters :AppCompatActivity() {
 
             var tmp: Bitmap? = Bitmap.createBitmap(getTmpImage()!!.width, getTmpImage()!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height)
-            photoImageView.setImageBitmap(tmp)
+            Image.setImageBitmap(tmp)
 
         }
     }
@@ -182,7 +176,8 @@ class Filters :AppCompatActivity() {
         getTmpImage()!!.getPixels(arr, 0, getTmpImage()!!.width, 0, 0, getTmpImage()!!.width, getTmpImage()!!.height) //получаем матрицу пикселей и записывает в массив
         setPixels(arr) // закинули в глобальный массив
     }
-
+    private val CAMERA_REQUEST_CODE = 0
+    private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
     fun normalizeBmp(value: Bitmap?): Bitmap? {
         var max = 3000
         var outWidth = 0
@@ -210,7 +205,7 @@ class Filters :AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     var bmp: Bitmap? = null
                     bmp = normalizeBmp(data.extras.get("data") as Bitmap)
-                    photoImageView.setImageBitmap(bmp)
+                    Image.setImageBitmap(bmp)
                     setTmpImage(bmp)
                     getPixelsMatrix()
                 }
@@ -226,7 +221,7 @@ class Filters :AppCompatActivity() {
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-                    photoImageView.setImageBitmap(bitmap)
+                    Image.setImageBitmap(bitmap)
                 }
             }
             else -> {
