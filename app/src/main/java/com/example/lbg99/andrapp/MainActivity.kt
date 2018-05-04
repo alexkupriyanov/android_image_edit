@@ -21,12 +21,16 @@ import android.os.Environment.DIRECTORY_PICTURES
 import android.support.v4.content.FileProvider
 import android.opengl.ETC1.getHeight
 import android.opengl.ETC1.getWidth
+import android.view.View
 import android.widget.ImageView
+import com.example.lbg99.andrapp.Filters.Companion.CAMERA_REQUEST_CODE
+import com.example.lbg99.andrapp.R.id.cameraBtn
+import com.example.lbg99.andrapp.R.id.galeryBtn
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+ class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
@@ -78,6 +82,14 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
+        filtBtn.setOnClickListener {
+            val randomIntent = Intent(this, Filters::class.java)
+
+            randomIntent.putExtra(Filters.CAMERA_REQUEST_CODE, CAMERA_REQUEST_CODE)
+            randomIntent.putExtra(Filters.REQUEST_SELECT_IMAGE_IN_ALBUM, REQUEST_IMAGE_CAPTURE)
+            startActivity(randomIntent)
+        }
+
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
@@ -91,4 +103,6 @@ class MainActivity : AppCompatActivity() {
             photoImageView.setImageBitmap(imageBitmap)
         }
     }
+
+
 }
