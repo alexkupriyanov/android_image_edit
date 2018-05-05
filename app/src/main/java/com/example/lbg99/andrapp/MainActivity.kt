@@ -12,11 +12,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.example.lbg99.andrapp.R.id.photoImageView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.FileOutputStream
@@ -29,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
-    public var imageBitmap: Bitmap?=null
+    var imageBitmap: Bitmap?=null
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -77,41 +75,46 @@ class MainActivity : AppCompatActivity() {
             }
         }
         filtBtn.setOnClickListener {
-
+            saveImage()
             randomMe()
         }
         imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
         saveBtn.setOnClickListener {
-            if (ActivityCompat.checkSelfPermission(applicationContext,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this@MainActivity,
-                        arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 102)
-            }
-                val root = Environment.getExternalStorageDirectory().toString()
-                val myDir = File(root + "/capture_photo")
-                myDir.mkdirs()
-                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                val OutletFname = "Image-$timeStamp.jpg"
-                val file = File(myDir, OutletFname)
-                if (file.exists()) file.delete()
-                try {
-                    val out = FileOutputStream(file)
-                    imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
-                    imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    out.flush()
-                    out.close()
-                    Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+           saveImage()
+            Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
         }
     }
-     fun randomMe () {
-         val randomIntent = Intent(this, Filters::class.java)
-         startActivity(randomIntent)
+    fun saveImage() {
+        if (ActivityCompat.checkSelfPermission(applicationContext,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 102)
+        }
+        val root = Environment.getExternalStorageDirectory().toString()
+        val myDir = File(root + "/capture_photo")
+        myDir.mkdirs()
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val OutletFname = "Image-$timeStamp.jpg"
+        val file = File(myDir, OutletFname)
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            mCurrentPhotoPath = file.absolutePath
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    fun randomMe () {
+        val randomIntent = Intent(this, Filters::class.java)
+        randomIntent.putExtra(Filters.absolutePath,mCurrentPhotoPath)
+        startActivity(randomIntent)
      }
 
-     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
             imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
