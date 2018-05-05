@@ -191,9 +191,20 @@ class Filters :AppCompatActivity() {
                         val x = Math.min(tmpImage!!.width - 1, Math.max(0, ix))
                         val y = Math.min(tmpImage!!.height - 1, Math.max(0, iy))
                         val dsq = (ix - j) * (ix - j) + (iy - i) * (iy - i)
+                        if((Math.PI * 2 * r * r).toInt() != 0)
+                        {
                         val wght = Math.exp((-dsq / (2 * r * r)).toDouble()) / (Math.PI * 2 * r * r)
+
                         valu += matrix!![y ][ x] * wght.toInt()
                         wsum += wght.toInt()
+                        }
+                        else{
+                            val wght = Math.exp((-dsq / (2 * r * r)).toDouble())
+
+                            valu += matrix!![y ][ x] * wght.toInt()
+                            wsum += wght.toInt()
+
+                        }
                     }
                 }
                 matrix1!![i][j] = Math.round((valu / wsum).toFloat())
