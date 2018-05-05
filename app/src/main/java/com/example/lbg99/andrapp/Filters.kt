@@ -83,30 +83,38 @@ class Filters :AppCompatActivity() {
             var Y: Double
             var I: Double
             var Q: Double
+
             var matrix = pixels
+
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
                 r = Color.red(color)
                 g = Color.green(color)
                 b = Color.blue(color)
+
                 Y = 0.299 * r + 0.587 * g + 0.114 * b
                 I = 1.0
                 Q = 0.0
+
                 //Transform to RGB
                 r = (1.0 * Y + 0.999 * I + 0.621 * Q).toInt()
                 g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
                 b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
+
                 //Fix values
                 r = if (r < 0) 0 else r
                 r = if (r > 255) 255 else r
+
                 g = if (g < 0) 0 else g
                 g = if (g > 255) 255 else g
+
                 b = if (b < 0) 0 else b
                 b = if (b > 255) 255 else b
                 val a = 255
                 val p = a shl 24 or (r shl 16) or (g shl 8) or b
                 matrix[i] = p
             }
+
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
             Image.setImageBitmap(tmp)
@@ -120,30 +128,38 @@ class Filters :AppCompatActivity() {
             var Y: Double
             var I: Double
             var Q: Double
+
             var matrix = pixels
+
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
                 r = Color.red(color)
                 g = Color.green(color)
                 b = Color.blue(color)
+
                 Y = 0.299 * r + 0.587 * g + 0.114 * b
                 I = 51.0
                 Q = 0.0
+
                 //Transform to RGB
                 r = (1.0 * Y + 0.999 * I + 0.621 * Q).toInt()
                 g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
                 b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
+
                 //Fix values
                 r = if (r < 0) 0 else r
                 r = if (r > 255) 255 else r
+
                 g = if (g < 0) 0 else g
                 g = if (g > 255) 255 else g
+
                 b = if (b < 0) 0 else b
                 b = if (b > 255) 255 else b
                 val a = 255
                 val p = a shl 24 or (r shl 16) or (g shl 8) or b
                 matrix[i] = p
             }
+
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
             Image.setImageBitmap(tmp)

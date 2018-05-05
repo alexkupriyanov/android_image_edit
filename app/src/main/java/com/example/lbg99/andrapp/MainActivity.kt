@@ -1,41 +1,33 @@
 package com.example.lbg99.andrapp
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
-import android.support.v7.app.AppCompatActivity
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.FileProvider
+import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import android.R.attr.bitmap
-import android.annotation.TargetApi
-import android.graphics.BitmapFactory
-import android.os.Build
-import android.os.Environment
-import android.support.annotation.RequiresApi
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
-import android.os.Environment.DIRECTORY_PICTURES
-import android.support.v4.content.FileProvider
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
-import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import com.example.lbg99.andrapp.R.id.cameraBtn
-import com.example.lbg99.andrapp.R.id.galeryBtn
-import com.example.lbg99.andrapp.R.id.filtBtn
 import java.text.SimpleDateFormat
 import java.util.*
 
 
- class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
-
+    var imageBitmap: Bitmap?=null
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -52,8 +44,7 @@ import java.util.*
         mCurrentPhotoPath = image.absolutePath
         return image
     }
-
-
+    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -67,7 +58,7 @@ import java.util.*
                     e.printStackTrace()
                 }
                 if (photoFile != null) {
-                    val auth: String  = packageName + ".fileprovider"
+                    val auth: String = packageName + ".fileprovider"
                     val photoURI = FileProvider.getUriForFile(this,
                             auth,
                             photoFile)
@@ -79,36 +70,60 @@ import java.util.*
         galeryBtn.setOnClickListener {
             val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
             callGalleryIntent.type = "image/*"
-            if(callGalleryIntent.resolveActivity(packageManager)!=null) {
-                    startActivityForResult(callGalleryIntent,REQUEST_IMAGE_CAPTURE)
-                }
+            if (callGalleryIntent.resolveActivity(packageManager) != null) {
+                startActivityForResult(callGalleryIntent, REQUEST_IMAGE_CAPTURE)
+            }
         }
-
         filtBtn.setOnClickListener {
-
-           randomMe()
+            saveImage()
+            randomMe()
         }
-
+        imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+        saveBtn.setOnClickListener {
+           saveImage()
+            Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
+        }
     }
-     fun randomMe () {
-         val randomIntent = Intent(this, Filters::class.java)
-         startActivity(randomIntent)
+    fun saveImage() {
+        if (ActivityCompat.checkSelfPermission(applicationContext,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 102)
+        }
+        val root = Environment.getExternalStorageDirectory().toString()
+        val myDir = File(root + "/capture_photo")
+        myDir.mkdirs()
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val OutletFname = "Image-$timeStamp.jpg"
+        val file = File(myDir, OutletFname)
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            mCurrentPhotoPath = file.absolutePath
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    fun randomMe () {
+        val randomIntent = Intent(this, Filters::class.java)
+        randomIntent.putExtra(Filters.absolutePath,mCurrentPhotoPath)
+        startActivity(randomIntent)
      }
 
-     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
-            val imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
+            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
             photoImageView.setImageBitmap(imageBitmap)
 
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            val imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
             photoImageView.setImageBitmap(imageBitmap)
         }
     }
-
-
 }
-
-
