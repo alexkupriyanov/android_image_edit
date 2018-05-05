@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
             randomMe()
         }
-        imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+        imageBitmap = (photoImageView2.drawable as BitmapDrawable).bitmap
         saveBtn.setOnClickListener {
             if (ActivityCompat.checkSelfPermission(applicationContext,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                 if (file.exists()) file.delete()
                 try {
                     val out = FileOutputStream(file)
-                    imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+                    imageBitmap = (photoImageView2.drawable as BitmapDrawable).bitmap
                     imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
                     out.flush()
                     out.close()
@@ -115,12 +115,12 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
             imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
-            photoImageView.setImageBitmap(imageBitmap)
+            photoImageView2.setImageBitmap(imageBitmap)
 
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
-            photoImageView.setImageBitmap(imageBitmap)
+            photoImageView2.setImageBitmap(imageBitmap)
         }
     }
 }

@@ -64,7 +64,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         fab.setOnClickListener {
             val content = arrayOf("Capture", "Upload")
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("How to take photo?")
+            builder.setTitle("@strings/take_quest")
                     .setItems(content, DialogInterface.OnClickListener { dialog, which ->
                         // The 'which' argument contains the index position
                         // of the selected item
