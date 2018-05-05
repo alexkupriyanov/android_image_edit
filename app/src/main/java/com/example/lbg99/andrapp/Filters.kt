@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,8 +29,7 @@ class Filters :AppCompatActivity() {
 
     var curPath: String? = null
     private var tmpImage: Bitmap? = null
-    private var pixels: IntArray? = null
-
+    private var pixels: Array<IntArray>? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,20 +42,24 @@ class Filters :AppCompatActivity() {
         binBtn.setOnClickListener {
             // пророговый фильтр(бинаризация)
             var matrix = pixels
-            for (i in 0 until matrix!!.size) {
-                val color = matrix[i]
-                val r = Color.red(color)
-                val g = Color.green(color)
-                val b = Color.blue(color)
-                val luminance = 0.299 * r + 0.0 + 0.587 * g + 0.0 + 0.114 * b + 0.0
-                matrix[i] = if (luminance > 125) Color.WHITE else Color.BLACK
-            }
+            for (i in 0 until tmpImage!!.width)
+                for(j in 0 until tmpImage!!.height)
+                {
+                    val color = matrix!![i][j]
+                    val r = Color.red(color)
+                    val g = Color.green(color)
+                    val b = Color.blue(color)
+                    val luminance = 0.299 * r + 0.0 + 0.587 * g + 0.0 + 0.114 * b + 0.0
+                    matrix[i][j] = if (luminance > 125) Color.WHITE else Color.BLACK
+                }
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
-            tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
+            for(i in 0 until matrix!!.size)
+                for(j in 0 until matrix[i].size)
+                    tmp!!.setPixel(i,j,matrix[i][j])
             Image.setImageBitmap(tmp)
-
         }
         inversBtn.setOnClickListener {
+            /*
             var matrix = pixels
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
@@ -69,10 +73,10 @@ class Filters :AppCompatActivity() {
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
             Image.setImageBitmap(tmp)
-
+            */
         }
         grayscalebutton.setOnClickListener {
-
+            /*
             var r: Int
             var g: Int
             var b: Int
@@ -114,9 +118,10 @@ class Filters :AppCompatActivity() {
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
             Image.setImageBitmap(tmp)
-
+            */
         }
         sepiabutton.setOnClickListener {
+            /*
             var r: Int
             var g: Int
             var b: Int
@@ -158,12 +163,15 @@ class Filters :AppCompatActivity() {
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
             Image.setImageBitmap(tmp)
+            */
         }
     }
-    fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
 
-        var arr = IntArray(tmpImage!!.width * tmpImage!!.height)
-        tmpImage?.getPixels(arr, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height) //получаем матрицу пикселей и записывает в массив
+    fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
+        var arr:Array<IntArray>? = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
+        for(i in 0 until tmpImage!!.width)
+            for(j in 0 until tmpImage!!.height)
+                arr!![i][j]= tmpImage!!.getPixel(i,j)
         pixels = arr // закинули в глобальный массив
     }
 
