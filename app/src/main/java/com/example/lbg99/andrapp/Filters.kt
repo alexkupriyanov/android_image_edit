@@ -30,13 +30,6 @@ class Filters :AppCompatActivity() {
     private var tmpImage: Bitmap? = null
     private var pixels: IntArray? = null
 
-    fun setPixels(value: IntArray?) {  // заполняем  pixels
-        pixels = value
-    }
-
-    fun getPixels(): IntArray? { // получает значения pixels для работы с ними
-        return pixels
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,9 +38,10 @@ class Filters :AppCompatActivity() {
         curPath = intent.getStringExtra(absolutePath)
         tmpImage = BitmapFactory.decodeFile(curPath)
         Image.setImageBitmap(tmpImage)
+        getPixelsMatrix()
         binBtn.setOnClickListener {
             // пророговый фильтр(бинаризация)
-            var matrix = getPixels()
+            var matrix = pixels
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
                 val r = Color.red(color)
@@ -62,7 +56,7 @@ class Filters :AppCompatActivity() {
 
         }
         inversBtn.setOnClickListener {
-            var matrix = getPixels()
+            var matrix = pixels
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
                 val r = 255 - Color.red(color)
@@ -86,7 +80,7 @@ class Filters :AppCompatActivity() {
             var I: Double
             var Q: Double
 
-            var matrix = getPixels()
+            var matrix = pixels
 
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
@@ -130,7 +124,7 @@ class Filters :AppCompatActivity() {
             var I: Double
             var Q: Double
 
-            var matrix = getPixels()
+            var matrix = pixels
 
             for (i in 0 until matrix!!.size) {
                 val color = matrix[i]
@@ -164,15 +158,13 @@ class Filters :AppCompatActivity() {
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             tmp!!.setPixels(matrix, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
             Image.setImageBitmap(tmp)
-
         }
     }
     fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
 
         var arr = IntArray(tmpImage!!.width * tmpImage!!.height)
-
         tmpImage?.getPixels(arr, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height) //получаем матрицу пикселей и записывает в массив
-        setPixels(arr) // закинули в глобальный массив
+        pixels = arr // закинули в глобальный массив
     }
 
 }
