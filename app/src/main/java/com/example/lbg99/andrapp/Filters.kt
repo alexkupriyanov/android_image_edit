@@ -160,6 +160,10 @@ class Filters :AppCompatActivity() {
             Image.setImageBitmap(tmp)
 
         }
+        gaussbutton.setOnClickListener{
+            gauss()
+
+        }
     }
 
     fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
@@ -168,6 +172,37 @@ class Filters :AppCompatActivity() {
             for(j in 0 until tmpImage!!.height)
                 arr!![i][j]= tmpImage!!.getPixel(i,j)
         pixels = arr // закинули в глобальный массив
+    }
+    fun gauss(){
+        var r=1
+        var matrix = pixels
+        var matrix1 = pixels
+        val rs = Math.ceil(r * 2.57)     // significant radius
+        for (i in 0 until tmpImage!!.height)
+            for (j in 0 until tmpImage!!.width) {
+                var valu = 0
+                var wsum = 0
+                 var t=i-rs.toInt()
+                 var s=j-rs.toInt()
+                for (iy in t until i+rs.toInt()+1)
+                {
+                    for (ix in s until j+rs.toInt()+1)
+                    {
+                        val x = Math.min(tmpImage!!.width - 1, Math.max(0, ix))
+                        val y = Math.min(tmpImage!!.height - 1, Math.max(0, iy))
+                        val dsq = (ix - j) * (ix - j) + (iy - i) * (iy - i)
+                        val wght = Math.exp((-dsq / (2 * r * r)).toDouble()) / (Math.PI * 2 * r * r)
+                        valu += matrix!![y ][ x] * wght.toInt()
+                        wsum += wght.toInt()
+                    }
+                }
+                matrix1!![i][j] = Math.round((valu / wsum).toFloat())
+            }
+        var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
+        for(i in 0 until matrix1!!.size)
+            for(j in 0 until matrix1[i].size)
+                tmp!!.setPixel(i,j,matrix1[i][j])
+        Image.setImageBitmap(tmp)
     }
 
 }
