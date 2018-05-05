@@ -17,13 +17,39 @@ import android.app.Dialog
 import android.app.PendingIntent.getActivity
 import android.R.string.cancel
 import android.app.DialogFragment
-
-
-
+import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
+import android.support.v4.content.FileProvider
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    val REQUEST_IMAGE_CAPTURE = 1
+    val REQUEST_TAKE_PHOTO = 2
+    var mCurrentPhotoPath: String? = null
+    public var imageBitmap: Bitmap?=null
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+                imageFileName, /* prefix */
+                ".jpg", /* suffix */
+                storageDir      /* directory */
+        )
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.absolutePath
+        return image
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_menu)
@@ -32,8 +58,38 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
 
 
         fab.setOnClickListener {
-            val diag = Diag()
-            diag.show(fragmentManager, "000")
+            val content = arrayOf("Capture", "Upload")
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("How to take photo?")
+                    .setItems(content, DialogInterface.OnClickListener { dialog, which ->
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        if (which == 0)
+                        {
+                            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                                var photoFile: File? = null
+                                try {
+                                    photoFile = createImageFile()
+                                } catch (e: IOException) {
+                                    e.printStackTrace()
+                                }
+                                if (photoFile != null) {
+                                    val auth: String = packageName + ".fileprovider"
+                                    val photoURI = FileProvider.getUriForFile(this,
+                                            auth,
+                                            photoFile)
+                                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
+                                }
+                            }
+                        }
+                        if (which == 1)
+                        {
+
+                        }
+                    })
+            builder.show()
         }
 
         val toggle = ActionBarDrawerToggle(
@@ -95,17 +151,4 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         return true
     }
 
-}
-
-class Diag : DialogFragment() {
-    val content = arrayOf("Capture", "Upload")
-    override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
-        val builder = AlertDialog.Builder(activity)
-        builder.setTitle("Upload")
-                .setItems(content, DialogInterface.OnClickListener { dialog, which ->
-                    // The 'which' argument contains the index position
-                    // of the selected item
-                })
-        return builder.create()
-    }
 }
