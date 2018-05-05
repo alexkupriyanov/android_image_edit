@@ -3,4 +3,11 @@
     <string name="get_photo">Get photo</string>
     <string name="get_image">Get image</string>
     <string name="save_image">Save image</string>
+    <string name="title_activity_nav_menu">nav_menu</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
 </resources>
