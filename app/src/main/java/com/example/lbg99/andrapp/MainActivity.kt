@@ -22,9 +22,11 @@ import android.support.v4.content.FileProvider
 import android.opengl.ETC1.getHeight
 import android.opengl.ETC1.getWidth
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import com.example.lbg99.andrapp.R.id.cameraBtn
 import com.example.lbg99.andrapp.R.id.galeryBtn
+import com.example.lbg99.andrapp.R.id.filtBtn
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,6 +35,7 @@ import java.util.*
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
+
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -82,12 +85,17 @@ import java.util.*
         }
 
         filtBtn.setOnClickListener {
-            val randomIntent = Intent(this, Filters::class.java)
-            startActivity(randomIntent)
+
+           randomMe()
         }
 
     }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+     fun randomMe () {
+         val randomIntent = Intent(this, Filters::class.java)
+         startActivity(randomIntent)
+     }
+
+     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
             val imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
@@ -102,3 +110,5 @@ import java.util.*
 
 
 }
+
+
