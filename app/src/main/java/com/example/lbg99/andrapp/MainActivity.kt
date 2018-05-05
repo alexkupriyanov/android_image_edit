@@ -22,7 +22,12 @@ import android.os.Environment.DIRECTORY_PICTURES
 import android.support.v4.content.FileProvider
 import android.opengl.ETC1.getHeight
 import android.opengl.ETC1.getWidth
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import com.example.lbg99.andrapp.R.id.cameraBtn
+import com.example.lbg99.andrapp.R.id.galeryBtn
+import com.example.lbg99.andrapp.R.id.filtBtn
 import com.example.lbg99.andrapp.R.attr.logo
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -83,6 +88,12 @@ class MainActivity : AppCompatActivity() {
                     startActivityForResult(callGalleryIntent,REQUEST_IMAGE_CAPTURE)
                 }
         }
+
+        filtBtn.setOnClickListener {
+
+           randomMe()
+        }
+
         imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
         saveBtn.setOnClickListener {
             val root = Environment.getExternalStorageDirectory().toString()
@@ -104,7 +115,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+     fun randomMe () {
+         val randomIntent = Intent(this, Filters::class.java)
+         startActivity(randomIntent)
+     }
+
+     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
             imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
