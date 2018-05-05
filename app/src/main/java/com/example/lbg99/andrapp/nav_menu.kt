@@ -19,9 +19,11 @@ import android.R.string.cancel
 import android.app.DialogFragment
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -50,6 +52,8 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         mCurrentPhotoPath = image.absolutePath
         return image
     }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_menu)
@@ -64,29 +68,11 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                     .setItems(content, DialogInterface.OnClickListener { dialog, which ->
                         // The 'which' argument contains the index position
                         // of the selected item
-                        if (which == 0)
-                        {
-                            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                                var photoFile: File? = null
-                                try {
-                                    photoFile = createImageFile()
-                                } catch (e: IOException) {
-                                    e.printStackTrace()
-                                }
-                                if (photoFile != null) {
-                                    val auth: String = packageName + ".fileprovider"
-                                    val photoURI = FileProvider.getUriForFile(this,
-                                            auth,
-                                            photoFile)
-                                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
-                                }
-                            }
+                        if (which == 0) {
+                           takeAndSetPhoto()
                         }
-                        if (which == 1)
-                        {
-
+                        if (which == 1) {
+                            photoFromGallery()
                         }
                     })
             builder.show()
@@ -100,6 +86,46 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         nav_view.setNavigationItemSelectedListener(this)
     }
 
+    private fun photoFromGallery() {
+        val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
+        callGalleryIntent.type = "image/*"
+        if (callGalleryIntent.resolveActivity(packageManager) != null) {
+            startActivityForResult(callGalleryIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    private fun takeAndSetPhoto(){
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            var photoFile: File? = null
+            try {
+                photoFile = createImageFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            if (photoFile != null) {
+                val auth: String = packageName + ".fileprovider"
+                val photoURI = FileProvider.getUriForFile(this,
+                        auth,
+                        photoFile)
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            val selectedImage = data?.data
+            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
+            photoImageView.setImageBitmap(imageBitmap)
+
+        }
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            photoImageView.setImageBitmap(imageBitmap)
+        }
+    }
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
