@@ -207,7 +207,12 @@ class Filters :AppCompatActivity() {
                         }
                     }
                 }
-                matrix1!![i][j] = Math.round((valu / wsum).toFloat())
+                if(wsum!=0){
+                    matrix1!![i][j] = Math.round((valu / wsum).toFloat())
+                }
+                else{
+                matrix1!![i][j] = Math.round((valu).toFloat())
+                }
             }
         var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
         for(i in 0 until matrix1!!.size)
