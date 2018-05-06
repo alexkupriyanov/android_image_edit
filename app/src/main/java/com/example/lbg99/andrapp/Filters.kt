@@ -161,64 +161,104 @@ class Filters :AppCompatActivity() {
 
         }
         gaussbutton.setOnClickListener{
-            gauss()
+
 
         }
     }
 
-    fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
+    fun getPixelsMatrix()
+    { //получает матрицу пикселей из bitmap (просто интовые байты)
         var arr:Array<IntArray>? = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
         for(i in 0 until tmpImage!!.width)
             for(j in 0 until tmpImage!!.height)
                 arr!![i][j]= tmpImage!!.getPixel(i,j)
         pixels = arr // закинули в глобальный массив
     }
-    fun gauss(){
-        var r=1
-        var matrix = pixels
-        var matrix1 = pixels
-        val rs = Math.ceil(r * 2.57)     // significant radius
-        for (i in 0 until tmpImage!!.height)
-            for (j in 0 until tmpImage!!.width) {
-                var valu = 0
-                var wsum = 0
-                 var t=i-rs.toInt()
-                 var s=j-rs.toInt()
-                for (iy in t until i+rs.toInt()+1)
-                {
-                    for (ix in s until j+rs.toInt()+1)
-                    {
-                        val x = Math.min(tmpImage!!.width - 1, Math.max(0, ix))
-                        val y = Math.min(tmpImage!!.height - 1, Math.max(0, iy))
-                        val dsq = (ix - j) * (ix - j) + (iy - i) * (iy - i)
-                        if((Math.PI * 2 * r * r).toInt() != 0)
-                        {
-                        val wght = Math.exp((-dsq / (2 * r * r)).toDouble()) / (Math.PI * 2 * r * r)
 
-                        valu += matrix!![y ][ x] * wght.toInt()
-                        wsum += wght.toInt()
-                        }
-                        else{
-                            val wght = Math.exp((-dsq / (2 * r * r)).toDouble())
 
-                            valu += matrix!![y ][ x] * wght.toInt()
-                            wsum += wght.toInt()
+    class ConvolutionMatrix(size: Int) {
+            var Matrix: Array<DoubleArray>
+            var Factor = 1.0
+            var Offset = 1.0
 
-                        }
+            init {
+                Matrix = Array<DoubleArray>(size, { DoubleArray(size) })
+            }
+
+            fun applyConfig(config: Array<DoubleArray>) {
+                for (x in 0 until SIZE) {
+                    for (y in 0 until SIZE) {
+                        Matrix[x][y] = config[x][y]
                     }
                 }
-                if(wsum!=0){
-                    matrix1!![i][j] = Math.round((valu / wsum).toFloat())
-                }
-                else{
-                matrix1!![i][j] = Math.round((valu).toFloat())
+            }
+
+            companion object {
+                val Radius = 5
+                val SIZE = Radius * 2 + 1
+
+                fun computeConvolution(src: Bitmap, matrix: ConvolutionMatrix): Bitmap {
+                    val width = src.getWidth()
+                    val height = src.getHeight()
+                    val result = Bitmap.createBitmap(width, height, src.getConfig())
+                    var A: Int
+                    var R: Int
+                    var G: Int
+                    var B: Int
+                    var sumR: Double
+                    var sumG: Double
+                    var sumB: Double
+                    var pixels1 = Array<IntArray>(SIZE, { IntArray(SIZE) })
+                    for (y in 0 until height - 2) {
+                        for (x in 0 until width - 2) {
+                            // get pixel matrix
+                            for (i in 0 until SIZE) {
+                                for (j in 0 until SIZE) {
+                                    pixels1[i][j] = src.getPixel(x + i, y + j)
+                                }
+                            }
+                            // get alpha of center pixel
+                            A = Color.alpha(pixels1[1][1])
+                            // init color sum
+                            sumB = 0.0
+                            sumG = 0.0
+                            sumR = 0.0
+                            // get sum of RGB on matrix
+                            for (i in 0 until SIZE) {
+                                for (j in 0 until SIZE) {
+                                    sumR += (Color.red(pixels1[i][j]) * matrix.Matrix[i][j])
+                                    sumG += (Color.green(pixels1[i][j]) * matrix.Matrix[i][j])
+                                    sumB += (Color.blue(pixels1[i][j]) * matrix.Matrix[i][j])
+                                }
+
+                                // get final Red
+                                R = (sumR / matrix.Factor + matrix.Offset).toInt()
+                                if (R < 0) {
+                                    R = 0
+                                } else if (R > 255) {
+                                    R = 255
+                                }
+                                // get final Green
+                                G = (sumG / matrix.Factor + matrix.Offset).toInt()
+                                if (G < 0) {
+                                    G = 0
+                                } else if (G > 255) {
+                                    G = 255
+                                }
+                                // get final Blue
+                                B = (sumB / matrix.Factor + matrix.Offset).toInt()
+                                if (B < 0) {
+                                    B = 0
+                                } else if (B > 255) {
+                                    B = 255
+                                }
+                                // apply new pixel
+                                result.setPixel(x + 1, y + 1, Color.argb(A, R, G, B))
+                            }
+                        }
+                    }
+                        return result
+                    }
                 }
             }
-        var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
-        for(i in 0 until matrix1!!.size)
-            for(j in 0 until matrix1[i].size)
-                tmp!!.setPixel(i,j,matrix1[i][j])
-        Image.setImageBitmap(tmp)
-    }
-
 }
