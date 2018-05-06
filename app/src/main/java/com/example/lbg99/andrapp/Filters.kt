@@ -198,7 +198,7 @@ class Filters :AppCompatActivity() {
         var Offset = 1.0
 
         init {
-            Matrix = Array<DoubleArray>(size, { DoubleArray(size) })
+            Matrix = Array(size, { DoubleArray(size) })
         }
 
         fun applyConfig(config: Array<DoubleArray>) {
