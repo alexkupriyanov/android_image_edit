@@ -181,7 +181,7 @@ class Filters :AppCompatActivity() {
 
     fun applyGaussianBlur(src: Bitmap) {
 //set gaussian blur configuration
-        val Radius = 11
+        val Radius = 3
 // create instance of Convolution matrix
         var weigts = Array(Radius, { DoubleArray(Radius) })
         var half = floor((Radius/2).toDouble())
@@ -237,7 +237,7 @@ class Filters :AppCompatActivity() {
         }
 
         companion object {
-            val Radius = 5
+            val Radius = 1
             val SIZE = Radius*2+1
 
 
@@ -252,12 +252,12 @@ class Filters :AppCompatActivity() {
                 var sumR: Double
                 var sumG: Double
                 var sumB: Double
-                var pixels1 = Array<IntArray>(height, { IntArray(width)})
+                var pixels1 = Array<IntArray>(width, { IntArray(height)})
                 var side= round(sqrt(SIZE.toDouble()))
                 var side1= floor(side/2)
 
-                for (y in 0 until height ) {
-                    for (x in 0 until width) {
+                for (x in 0 until width ) {
+                    for (y in 0 until height) {
 // get pixel matrix
                         // get alpha of center pixel
                         A = Color.alpha(pixels1[1][1])
@@ -270,7 +270,7 @@ class Filters :AppCompatActivity() {
                         var j =0
                         // get pixel matrix
 
-                                pixels1[y][x] = src.getPixel(y, x)
+                                pixels1[x][y] = src.getPixel(x, y)
 
 
                         for (i in 0 until side.toInt())
@@ -281,9 +281,9 @@ class Filters :AppCompatActivity() {
                                 var xr=( x + i - side1).toInt()
 
                                 if(yr>=0 && xr>=0 && yr < height && xr < width){
-                                    sumR += (Color.red(pixels1[xr][yr]) * matrix.Matrix[i][j])
-                                    sumG += (Color.green(pixels1[xr][yr]) * matrix.Matrix[i][j])
-                                    sumB += (Color.blue(pixels1[xr][yr]) * matrix.Matrix[i][j])
+                                    sumR += (Color.red(pixels1[yr][xr]) * matrix.Matrix[i][j])
+                                    sumG += (Color.green(pixels1[yr][xr]) * matrix.Matrix[i][j])
+                                    sumB += (Color.blue(pixels1[yr][xr]) * matrix.Matrix[i][j])
 
                                 }// get sum of RGB on matrix
 
