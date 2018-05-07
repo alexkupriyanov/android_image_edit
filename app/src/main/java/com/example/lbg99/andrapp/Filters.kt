@@ -10,10 +10,11 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
+import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
 import kotlinx.android.synthetic.main.activity_filters.*
 import kotlinx.android.synthetic.main.activity_filters.view.*
 import java.io.IOException
-
+import kotlin.math.*
 
 
 class Filters :AppCompatActivity() {
@@ -160,10 +161,12 @@ class Filters :AppCompatActivity() {
             Image.setImageBitmap(tmp)
 
         }
-        gaussbutton.setOnClickListener{
 
+            gaussbutton.setOnClickListener{
+                applyGaussianBlur(tmpImage!!)
 
-        }
+            }
+
     }
 
     fun getPixelsMatrix()
@@ -176,89 +179,146 @@ class Filters :AppCompatActivity() {
     }
 
 
-    class ConvolutionMatrix(size: Int) {
-            var Matrix: Array<DoubleArray>
-            var Factor = 1.0
-            var Offset = 1.0
+    fun applyGaussianBlur(src: Bitmap) {
+//set gaussian blur configuration
+        val Radius = 11
+// create instance of Convolution matrix
+        var weigts = Array(Radius, { DoubleArray(Radius) })
+        var half = floor((Radius/2).toDouble())
+        var sum=0.0
 
-            init {
-                Matrix = Array<DoubleArray>(size, { DoubleArray(size) })
+        for (x in 0 until Radius.toInt()) {
+            for (y in 0 until Radius.toInt()) {
+                var x1=x-half
+                var y1 = y-half
+
+                var value1=(1 / (2 * PI * half * half)) * exp(-(x1 * x1 + y1 * y1) / (2 * half * half))
+
+                weigts[x][y]=value1
+                sum+=value1
+
             }
+        }
 
-            fun applyConfig(config: Array<DoubleArray>) {
-                for (x in 0 until SIZE) {
-                    for (y in 0 until SIZE) {
-                        Matrix[x][y] = config[x][y]
-                    }
+        for (i in 0 until weigts.size) {
+            for (j in 0 until weigts[i].size) {
+                weigts[i][j] /= sum
+            }
+        }
+
+
+        val convMatrix = ConvolutionMatrix(weigts.size)
+// Apply Configuration
+        convMatrix.applyConfig(weigts)
+        val width = src.getWidth()
+        val height = src.getHeight()
+//return out put bitmap
+        var t:Bitmap? =computeConvolution(src, convMatrix)
+        Image.setImageBitmap(t)
+
+    }
+
+
+    class ConvolutionMatrix(size: Int) {
+        var Matrix: Array<DoubleArray>
+        var Factor = 1.0
+        var Offset = 1.0
+
+        init {
+            Matrix = Array(size, { DoubleArray(size) })
+        }
+
+        fun applyConfig(config: Array<DoubleArray>) {
+            for (x in 0 until SIZE) {
+                for (y in 0 until SIZE) {
+                    Matrix[x][y] = config[x][y]
                 }
             }
+        }
 
-            companion object {
-                val Radius = 5
-                val SIZE = Radius * 2 + 1
+        companion object {
+            val Radius = 5
+            val SIZE = Radius*2+1
 
-                fun computeConvolution(src: Bitmap, matrix: ConvolutionMatrix): Bitmap {
-                    val width = src.getWidth()
-                    val height = src.getHeight()
-                    val result = Bitmap.createBitmap(width, height, src.getConfig())
-                    var A: Int
-                    var R: Int
-                    var G: Int
-                    var B: Int
-                    var sumR: Double
-                    var sumG: Double
-                    var sumB: Double
-                    var pixels1 = Array<IntArray>(SIZE, { IntArray(SIZE) })
-                    for (y in 0 until height - 2) {
-                        for (x in 0 until width - 2) {
-                            // get pixel matrix
-                            for (i in 0 until SIZE) {
-                                for (j in 0 until SIZE) {
-                                    pixels1[i][j] = src.getPixel(x + i, y + j)
-                                }
-                            }
-                            // get alpha of center pixel
-                            A = Color.alpha(pixels1[1][1])
-                            // init color sum
-                            sumB = 0.0
-                            sumG = 0.0
-                            sumR = 0.0
-                            // get sum of RGB on matrix
-                            for (i in 0 until SIZE) {
-                                for (j in 0 until SIZE) {
-                                    sumR += (Color.red(pixels1[i][j]) * matrix.Matrix[i][j])
-                                    sumG += (Color.green(pixels1[i][j]) * matrix.Matrix[i][j])
-                                    sumB += (Color.blue(pixels1[i][j]) * matrix.Matrix[i][j])
-                                }
 
-                                // get final Red
-                                R = (sumR / matrix.Factor + matrix.Offset).toInt()
-                                if (R < 0) {
-                                    R = 0
-                                } else if (R > 255) {
-                                    R = 255
-                                }
-                                // get final Green
-                                G = (sumG / matrix.Factor + matrix.Offset).toInt()
-                                if (G < 0) {
-                                    G = 0
-                                } else if (G > 255) {
-                                    G = 255
-                                }
-                                // get final Blue
-                                B = (sumB / matrix.Factor + matrix.Offset).toInt()
-                                if (B < 0) {
-                                    B = 0
-                                } else if (B > 255) {
-                                    B = 255
-                                }
-                                // apply new pixel
-                                result.setPixel(x + 1, y + 1, Color.argb(A, R, G, B))
+            fun computeConvolution(src: Bitmap, matrix: ConvolutionMatrix): Bitmap {
+                val width = src.getWidth()
+                val height = src.getHeight()
+                val result = Bitmap.createBitmap(width, height, src.getConfig())
+                var A: Int
+                var R: Int
+                var G: Int
+                var B: Int
+                var sumR: Double
+                var sumG: Double
+                var sumB: Double
+                var pixels1 = Array<IntArray>(height, { IntArray(width)})
+                var side= round(sqrt(SIZE.toDouble()))
+                var side1= floor(side/2)
+
+                for (y in 0 until height ) {
+                    for (x in 0 until width) {
+// get pixel matrix
+                        // get alpha of center pixel
+                        A = Color.alpha(pixels1[1][1])
+// init color sum
+                        sumB = 0.0
+                        sumG = 0.0
+                        sumR = 0.0
+                        // get pixel matrix
+                        var i =0
+                        var j =0
+                        // get pixel matrix
+
+                                pixels1[y][x] = src.getPixel(y, x)
+
+
+                        for (i in 0 until side.toInt())
+                        {
+                            for (j in 0 until side.toInt())
+                            {
+                                var yr= (y + i - side1).toInt()
+                                var xr=( x + i - side1).toInt()
+
+                                if(yr>=0 && xr>=0 && yr < height && xr < width){
+                                    sumR += (Color.red(pixels1[xr][yr]) * matrix.Matrix[i][j])
+                                    sumG += (Color.green(pixels1[xr][yr]) * matrix.Matrix[i][j])
+                                    sumB += (Color.blue(pixels1[xr][yr]) * matrix.Matrix[i][j])
+
+                                }// get sum of RGB on matrix
+
                             }
                         }
+// get final Red
+                            //R = (sumR / matrix.Factor + matrix.Offset).toInt()
+                        R=sumR.toInt()
+                            if (R < 0) {
+                                R = 0
+                            } else if (R > 255) {
+                                R = 255
+                            }
+// get final Green
+                           // G = (sumG / matrix.Factor + matrix.Offset).toInt()
+                        G=sumG.toInt()
+                            if (G < 0) {
+                                G = 0
+                            } else if (G > 255) {
+                                G = 255
+                            }
+// get final Blue
+                            //B = (sumB / matrix.Factor + matrix.Offset).toInt()
+                        B=sumB.toInt()
+                            if (B < 0) {
+                                B = 0
+                            } else if (B > 255) {
+                                B = 255
+                            }
+// apply new pixel
+                            result.setPixel(x, y, Color.argb(A, R, G, B))
+                        }
                     }
-                        return result
-                    }
-                }
+                return result
             }
+        }
+    }
 }
