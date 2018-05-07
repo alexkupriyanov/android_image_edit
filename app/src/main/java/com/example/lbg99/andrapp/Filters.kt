@@ -9,12 +9,14 @@ import android.graphics.Matrix
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.ImageView
 import android.widget.Toast
-import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
+//import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
 import kotlinx.android.synthetic.main.activity_filters.*
 import kotlinx.android.synthetic.main.activity_filters.view.*
 import java.io.IOException
 import kotlin.math.*
+import kotlin.text.Typography.half
 
 
 class Filters :AppCompatActivity() {
@@ -163,7 +165,8 @@ class Filters :AppCompatActivity() {
         }
 
             gaussbutton.setOnClickListener{
-                applyGaussianBlur(tmpImage!!)
+               // applyGaussianBlur(tmpImage!!, 1)
+                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 2))
 
             }
 
@@ -179,146 +182,84 @@ class Filters :AppCompatActivity() {
     }
 
 
-    fun applyGaussianBlur(src: Bitmap) {
-//set gaussian blur configuration
-        val Radius = 3
-// create instance of Convolution matrix
-        var weigts = Array(Radius, { DoubleArray(Radius) })
-        var half = floor((Radius/2).toDouble())
-        var sum=0.0
+    fun  applyGaussianBlur(src: Bitmap, radius: Int): Bitmap  {
 
-        for (x in 0 until Radius.toInt()) {
-            for (y in 0 until Radius.toInt()) {
-                var x1=x-half
-                var y1 = y-half
+        val SIZE = 2 * radius + 1
+        var sum = 0.0
+        val pixels = Array(SIZE) { IntArray(SIZE) } // массив изменяемых пикселей
+        val weigts = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
+        val width = src.width
+        val height = src.height
 
-                var value1=(1 / (2 * PI * half * half)) * exp(-(x1 * x1 + y1 * y1) / (2 * half * half))
+        var sumR: Int
+        var sumG: Int   // переменные для вычисления суммы цвета
+        var sumB: Int
 
-                weigts[x][y]=value1
-                sum+=value1
+        var x1 = 0
+        var y1 = 0
+        val result = Bitmap.createBitmap(width, height, src.config)
 
+        for (x in -radius until radius) {
+            for (y in -radius until radius) {
+                weigts[x1][y1] = (1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                sum += weigts[x1][y1]
+                y1++
             }
+            y1 = 0
+            x1++
         }
 
-        for (i in 0 until weigts.size) {
-            for (j in 0 until weigts[i].size) {
-                weigts[i][j] /= sum
-            }
-        }
+        if (sum == 0.0)  // чтобы избежать деления на 0
+            sum = 1.0
 
+        for (y in 0 until height - SIZE + 1) {
+            for (x in 0 until width - SIZE + 1) {
 
-        val convMatrix = ConvolutionMatrix(weigts.size)
-// Apply Configuration
-        convMatrix.applyConfig(weigts)
-        val width = src.getWidth()
-        val height = src.getHeight()
-//return out put bitmap
-        var t:Bitmap? =computeConvolution(src, convMatrix)
-        Image.setImageBitmap(t)
-
-    }
-
-
-    class ConvolutionMatrix(size: Int) {
-        var Matrix: Array<DoubleArray>
-        var Factor = 1.0
-        var Offset = 1.0
-
-        init {
-            Matrix = Array(size, { DoubleArray(size) })
-        }
-
-        fun applyConfig(config: Array<DoubleArray>) {
-            for (x in 0 until SIZE) {
-                for (y in 0 until SIZE) {
-                    Matrix[x][y] = config[x][y]
-                }
-            }
-        }
-
-        companion object {
-            val Radius = 1
-            val SIZE = Radius*2+1
-
-
-            fun computeConvolution(src: Bitmap, matrix: ConvolutionMatrix): Bitmap {
-                val width = src.getWidth()
-                val height = src.getHeight()
-                val result = Bitmap.createBitmap(width, height, src.getConfig())
-                var A: Int
-                var R: Int
-                var G: Int
-                var B: Int
-                var sumR: Double
-                var sumG: Double
-                var sumB: Double
-                var pixels1 = Array<IntArray>(width, { IntArray(height)})
-                var side= round(sqrt(SIZE.toDouble()))
-                var side1= floor(side/2)
-
-                for (x in 0 until width ) {
-                    for (y in 0 until height) {
-// get pixel matrix
-                        // get alpha of center pixel
-                        A = Color.alpha(pixels1[1][1])
-// init color sum
-                        sumB = 0.0
-                        sumG = 0.0
-                        sumR = 0.0
-                        // get pixel matrix
-                        var i =0
-                        var j =0
-                        // get pixel matrix
-
-                                pixels1[x][y] = src.getPixel(x, y)
-
-
-                        for (i in 0 until side.toInt())
-                        {
-                            for (j in 0 until side.toInt())
-                            {
-                                var yr= (y + i - side1).toInt()
-                                var xr=( x + i - side1).toInt()
-
-                                if(yr>=0 && xr>=0 && yr < height && xr < width){
-                                    sumR += (Color.red(pixels1[yr][xr]) * matrix.Matrix[i][j])
-                                    sumG += (Color.green(pixels1[yr][xr]) * matrix.Matrix[i][j])
-                                    sumB += (Color.blue(pixels1[yr][xr]) * matrix.Matrix[i][j])
-
-                                }// get sum of RGB on matrix
-
-                            }
-                        }
-// get final Red
-                            //R = (sumR / matrix.Factor + matrix.Offset).toInt()
-                        R=sumR.toInt()
-                            if (R < 0) {
-                                R = 0
-                            } else if (R > 255) {
-                                R = 255
-                            }
-// get final Green
-                           // G = (sumG / matrix.Factor + matrix.Offset).toInt()
-                        G=sumG.toInt()
-                            if (G < 0) {
-                                G = 0
-                            } else if (G > 255) {
-                                G = 255
-                            }
-// get final Blue
-                            //B = (sumB / matrix.Factor + matrix.Offset).toInt()
-                        B=sumB.toInt()
-                            if (B < 0) {
-                                B = 0
-                            } else if (B > 255) {
-                                B = 255
-                            }
-// apply new pixel
-                            result.setPixel(x, y, Color.argb(A, R, G, B))
-                        }
+                for (i in 0 until SIZE) {
+                    for (j in 0 until SIZE) {
+                        pixels[i][j] = src.getPixel(x + i, y + j) // оригинальная матрица пикселей изображения
                     }
-                return result
+                }
+
+               var A = Color.alpha(pixels[1][1])
+                sumB = 0
+                sumG = sumB
+                sumR = sumG
+
+                for (i in 0 until SIZE) {
+                    for (j in 0 until SIZE) {
+                        sumR += (Color.red(pixels[i][j]) * weigts[i][j]).toInt()
+                        sumG += (Color.green(pixels[i][j]) * weigts[i][j]).toInt()  // считаем сумму для цветов
+                        sumB += (Color.blue(pixels[i][j]) * weigts[i][j]).toInt()
+                    }
+                }
+
+               var R = (sumR / sum).toInt()
+                if (R < 0) {
+                    R = 0
+                } else if (R > 255) {
+                    R = 255
+                }
+                                                // получаем итоговые цвета
+               var G = (sumG / sum).toInt()
+                if (G < 0) {
+                    G = 0
+                } else if (G > 255) {
+                    G = 255
+                }
+
+              var  B = (sumB / sum).toInt()
+                if (B < 0) {
+                    B = 0
+                } else if (B > 255) {
+                    B = 255
+                }
+
+                result.setPixel(x + 1, y + 1, Color.argb(A, R, G, B)) // изображение готово :)
             }
         }
+        //imageview.setImageBitmap(result)
+        return result
     }
+
 }
