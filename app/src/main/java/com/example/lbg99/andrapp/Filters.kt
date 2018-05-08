@@ -166,7 +166,7 @@ class Filters :AppCompatActivity() {
 
             gaussbutton.setOnClickListener{
                // applyGaussianBlur(tmpImage!!, 1)
-                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 2))
+                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3))
 
             }
 
@@ -187,7 +187,7 @@ class Filters :AppCompatActivity() {
         val SIZE = 2 * radius + 1
         var sum = 0.0
         val pixels = Array(SIZE) { IntArray(SIZE) } // массив изменяемых пикселей
-        val weigts = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
+        val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
         val width = src.width
         val height = src.height
 
@@ -201,8 +201,9 @@ class Filters :AppCompatActivity() {
 
         for (x in -radius until radius) {
             for (y in -radius until radius) {
-                weigts[x1][y1] = (1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
-                sum += weigts[x1][y1]
+                weights[x1][y1] = (Math.pow (Math.E, (-((x*x+y*y)/(2*radius*radius))).toDouble())) / (2*PI*radius*radius)
+               // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                sum += weights[x1][y1]
                 y1++
             }
             y1 = 0
@@ -228,27 +229,27 @@ class Filters :AppCompatActivity() {
 
                 for (i in 0 until SIZE) {
                     for (j in 0 until SIZE) {
-                        sumR += (Color.red(pixels[i][j]) * weigts[i][j]).toInt()
-                        sumG += (Color.green(pixels[i][j]) * weigts[i][j]).toInt()  // считаем сумму для цветов
-                        sumB += (Color.blue(pixels[i][j]) * weigts[i][j]).toInt()
+                        sumR += ((Color.red(pixels[i][j]) * weights[i][j])/sum).toInt()
+                        sumG += ((Color.green(pixels[i][j]) * weights[i][j])/sum).toInt()  // считаем сумму для цветов
+                        sumB += ((Color.blue(pixels[i][j]) * weights[i][j])/sum).toInt()
                     }
                 }
 
-               var R = (sumR / sum).toInt()
+               var R = (sumR).toInt()
                 if (R < 0) {
                     R = 0
                 } else if (R > 255) {
                     R = 255
                 }
                                                 // получаем итоговые цвета
-               var G = (sumG / sum).toInt()
+               var G = (sumG).toInt()
                 if (G < 0) {
                     G = 0
                 } else if (G > 255) {
                     G = 255
                 }
 
-              var  B = (sumB / sum).toInt()
+              var  B = (sumB).toInt()
                 if (B < 0) {
                     B = 0
                 } else if (B > 255) {
