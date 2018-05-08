@@ -12,12 +12,21 @@ import android.provider.MediaStore
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.lbg99.andrapp.R.id.*
+import android.support.v7.app.AlertDialog
 //import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
 import kotlinx.android.synthetic.main.activity_filters.*
 import kotlinx.android.synthetic.main.activity_filters.view.*
 import java.io.IOException
 import kotlin.math.*
 import kotlin.text.Typography.half
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import java.util.Collections.rotate
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.content.DialogInterface
+
+
 
 
 class Filters :AppCompatActivity() {
@@ -169,8 +178,35 @@ class Filters :AppCompatActivity() {
                 Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3,0.0,2.0))
 
                }
+        seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                // Write code to perform some action when progress is changed.
+            }
 
-}
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                // Write code to perform some action when touch is started.
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                // Write code to perform some action when touch is stopped.
+                val number = findViewById(R.id.seekBar) as SeekBar
+                val value = (number.progress - 180).toDouble()
+                try {
+                    Rotate(value)
+                } catch (e: OutOfMemoryError) { //если недостаточно памяти
+                    Toast.makeText(applicationContext, "Недостаточно памяти для выполнения операции", Toast.LENGTH_SHORT).show()
+                }
+
+                val imageview = findViewById(R.id.Image) as ImageView
+                imageview.setImageBitmap(tmpImage)
+
+            }
+
+
+
+
+})
+    }
 
     fun getPixelsMatrix()
     { //получает матрицу пикселей из bitmap (просто интовые байты)
@@ -268,6 +304,30 @@ class Filters :AppCompatActivity() {
 
         //imageview.setImageBitmap(result)
         return result
+    }
+
+
+    /** Поворачивает изображение  */
+    fun Rotate(value: Double) {
+        var value = value
+        value = Math.toRadians(value)
+        //инициализация переменных перед преобазованием
+        val w = tmpImage!!.width
+        val h = tmpImage!!.height
+        val pixels = IntArray(w * h)
+        tmpImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
+        //поворот currentBitmap
+        tmpImage = rotate(value, w, h, pixels)
+    }
+
+    /** повораичвает изображение на заданный угол  */
+    //сейчас использует встроенные средства; возможно, это надо исправить
+    fun rotate(alpha: Double, w: Int, h: Int, pixels: IntArray): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(Math.toDegrees(alpha).toFloat())
+        var temp = Bitmap.createBitmap(pixels, w, h, Bitmap.Config.ARGB_8888)
+        temp = Bitmap.createBitmap(temp, 0, 0, w, h, matrix, true)
+        return temp
     }
 
 }
