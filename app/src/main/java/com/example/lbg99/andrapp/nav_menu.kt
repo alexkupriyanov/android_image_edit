@@ -1,5 +1,6 @@
 package com.example.lbg99.andrapp
 
+import android.Manifest
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -18,13 +19,18 @@ import android.app.PendingIntent.getActivity
 import android.R.string.cancel
 import android.app.DialogFragment
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.FileProvider
-import kotlinx.android.synthetic.main.activity_main.*
+import android.widget.Toast
+import kotlinx.android.synthetic.main.nav_header_nav_menu.*
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -62,9 +68,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
 
 
         fab.setOnClickListener {
-            val content = arrayOf("Capture", "Upload")
+            val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("@strings/take_quest")
+            builder.setTitle(R.string.take_quest)
                     .setItems(content, DialogInterface.OnClickListener { dialog, which ->
                         // The 'which' argument contains the index position
                         // of the selected item
@@ -76,6 +82,11 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                         }
                     })
             builder.show()
+        }
+        imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+        saveBtn.setOnClickListener {
+            saveImage()
+            Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
         }
 
         val toggle = ActionBarDrawerToggle(
@@ -93,7 +104,35 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             startActivityForResult(callGalleryIntent, REQUEST_IMAGE_CAPTURE)
         }
     }
-
+    fun saveImage() {
+        if (ActivityCompat.checkSelfPermission(applicationContext,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this@nav_menu,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 102)
+        }
+        val root = Environment.getExternalStorageDirectory().toString()
+        val myDir = File(root + "/capture_photo")
+        myDir.mkdirs()
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val OutletFname = "Image-$timeStamp.jpg"
+        val file = File(myDir, OutletFname)
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            mCurrentPhotoPath = file.absolutePath
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    /*fun randomMe () {
+        val randomIntent = Intent(this, Filters::class.java)
+        randomIntent.putExtra(Filters.absolutePath,mCurrentPhotoPath)
+        startActivity(randomIntent)
+    }*/
     private fun takeAndSetPhoto(){
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -153,24 +192,10 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
-            }
             R.id.nav_share -> {
 
             }
-            R.id.nav_send -> {
 
-            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

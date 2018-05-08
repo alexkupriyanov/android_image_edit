@@ -28,17 +28,29 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="wrap_content"
+        android:layout_width="59dp"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:srcCompat="@android:drawable/ic_menu_add" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/saveBtn"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:paddingBottom="16dp"
+        app:srcCompat="@android:drawable/ic_menu_save" />
     <ImageView
         android:id="@+id/photoImageView"
         android:layout_width="match_parent"
         android:layout_height="398dp"
         android:layout_marginTop="60dp"
         app:srcCompat="@mipmap/ic_launcher" />
+
+
 
 </android.support.design.widget.CoordinatorLayout>
