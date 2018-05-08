@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.ImageView
 import android.widget.Toast
+import com.example.lbg99.andrapp.R.id.*
 //import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
 import kotlinx.android.synthetic.main.activity_filters.*
 import kotlinx.android.synthetic.main.activity_filters.view.*
@@ -165,12 +166,11 @@ class Filters :AppCompatActivity() {
         }
 
             gaussbutton.setOnClickListener{
-               // applyGaussianBlur(tmpImage!!, 1)
-                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3))
+                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3,0.0,2.0))
 
-            }
+               }
 
-    }
+}
 
     fun getPixelsMatrix()
     { //получает матрицу пикселей из bitmap (просто интовые байты)
@@ -182,18 +182,18 @@ class Filters :AppCompatActivity() {
     }
 
 
-    fun  applyGaussianBlur(src: Bitmap, radius: Int): Bitmap  {
+    fun  applyGaussianBlur(src: Bitmap, radius: Int,threshold:Double,amount:Double): Bitmap  {
 
         val SIZE = 2 * radius + 1
         var sum = 0.0
-        val pixels = Array(SIZE) { IntArray(SIZE) } // массив изменяемых пикселей
+        var pixels = IntArray(src!!.width * src!!.height)
         val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
         val width = src.width
         val height = src.height
-
-        var sumR: Int
-        var sumG: Int   // переменные для вычисления суммы цвета
-        var sumB: Int
+        src.getPixels(pixels, 0, width, 0, 0, width, height)
+        var sumR: Double
+        var sumG:Double  // переменные для вычисления суммы цвета
+        var sumB: Double
 
         var x1 = 0
         var y1 = 0
@@ -216,49 +216,56 @@ class Filters :AppCompatActivity() {
         for (y in 0 until height - SIZE + 1) {
             for (x in 0 until width - SIZE + 1) {
 
-                for (i in 0 until SIZE) {
-                    for (j in 0 until SIZE) {
-                        pixels[i][j] = src.getPixel(x + i, y + j) // оригинальная матрица пикселей изображения
-                    }
-                }
 
-               var A = Color.alpha(pixels[1][1])
-                sumB = 0
+                sumB = 0.0
                 sumG = sumB
                 sumR = sumG
 
                 for (i in 0 until SIZE) {
                     for (j in 0 until SIZE) {
-                        sumR += ((Color.red(pixels[i][j]) * weights[i][j])/sum).toInt()
-                        sumG += ((Color.green(pixels[i][j]) * weights[i][j])/sum).toInt()  // считаем сумму для цветов
-                        sumB += ((Color.blue(pixels[i][j]) * weights[i][j])/sum).toInt()
+                        sumR += ((Color.red(pixels[x+i+width*(y+j)]) * weights[i][j]))
+                        sumG += ((Color.green(pixels[x+i+width*(y+j)]) * weights[i][j]))  // считаем сумму для цветов
+                        sumB += ((Color.blue(pixels[x+i+width*(y+j)]) * weights[i][j]))
                     }
                 }
 
-               var R = (sumR).toInt()
+               var R = (sumR/sum).toInt()
                 if (R < 0) {
                     R = 0
                 } else if (R > 255) {
                     R = 255
                 }
                                                 // получаем итоговые цвета
-               var G = (sumG).toInt()
+               var G = (sumG/sum).toInt()
                 if (G < 0) {
                     G = 0
                 } else if (G > 255) {
                     G = 255
                 }
 
-              var  B = (sumB).toInt()
+              var  B = (sumB/sum).toInt()
                 if (B < 0) {
                     B = 0
                 } else if (B > 255) {
                     B = 255
                 }
 
-                result.setPixel(x + 1, y + 1, Color.argb(A, R, G, B)) // изображение готово :)
+                var diff = (R - Color.red(pixels[(x+1)+(y+1)*width]) + G - Color.green(pixels[(x+1)+(y+1)*width]) + B - Color.blue(pixels[(x+1)+(y+1)*width])) / 3;
+                if (Math.abs(2*diff) > threshold) {
+                    R = Color.red(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
+                    G = Color.green(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
+                    B = Color.blue(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
+                    if (R > 255) R = 255
+                    if (R < 0) R = 0
+                    if (G > 255) G = 255
+                    if (G < 0) G = 0
+                    if (B > 255) B = 255
+                    if (B < 0) B = 0
+                }
+                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B));
             }
-        }
+            }
+
         //imageview.setImageBitmap(result)
         return result
     }
