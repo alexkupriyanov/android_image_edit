@@ -42,6 +42,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
     public var imageBitmap: Bitmap?=null
+
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -104,6 +105,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             startActivityForResult(callGalleryIntent, REQUEST_IMAGE_CAPTURE)
         }
     }
+
     fun saveImage() {
         if (ActivityCompat.checkSelfPermission(applicationContext,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -128,11 +130,6 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             e.printStackTrace()
         }
     }
-    /*fun randomMe () {
-        val randomIntent = Intent(this, Filters::class.java)
-        randomIntent.putExtra(Filters.absolutePath,mCurrentPhotoPath)
-        startActivity(randomIntent)
-    }*/
     private fun takeAndSetPhoto(){
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -178,22 +175,31 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         menuInflater.inflate(R.menu.nav_menu, menu)
         return true
     }
-
+    fun randomMe () {
+        val randomIntent = Intent(this, filter::class.java)
+        randomIntent.putExtra(filter.absolutePath,mCurrentPhotoPath)
+        startActivity(randomIntent)
+    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
-            R.id.action_settings -> return true
+            R.id.action_settings ->{
+
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_share -> {
-
+            R.id.smth -> {
+                saveImage()
+                randomMe()
             }
 
         }

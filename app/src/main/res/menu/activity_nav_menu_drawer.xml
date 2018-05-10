@@ -5,17 +5,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/feature1"
+            android:id="@+id/filter"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Feature 1" />
+            android:title="Filters" />
     </group>
 
     <item android:title="Other">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/smth"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Fdsfsfs" />
         </menu>
     </item>
 

@@ -21,19 +21,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Filters" />
-        <activity
-            android:name=".nav_menu"
+        <activity android:name=".nav_menu"
             android:label="@string/title_activity_nav_menu"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -41,6 +29,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".filter"
+            android:label="@string/title_activity_filter"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
