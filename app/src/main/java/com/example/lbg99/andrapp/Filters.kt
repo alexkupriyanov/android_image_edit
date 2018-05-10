@@ -1,9 +1,5 @@
 package com.example.lbg99.andrapp
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.Matrix
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 //import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
@@ -12,8 +8,14 @@ import kotlin.math.*
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import android.graphics.Canvas
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.*
 import android.widget.TextView
+//import sun.swing.SwingUtilities2.drawRect
+
+
 
 
 
@@ -330,7 +332,7 @@ class Filters :AppCompatActivity() {
         val textview = findViewById<View>(R.id.text) as TextView
         textview.text = "Назначьте три точки исходного треугольника [1-2-3]"
         imageview.setOnTouchListener(object : View.OnTouchListener {
-            internal var points = arrayOfNulls<TextView>(6)
+            var points = arrayOfNulls<TextView>(6)
             var pointsX = DoubleArray(6)
             var pointsY = DoubleArray(6)
             internal var ids = IntArray(6)
@@ -345,6 +347,8 @@ class Filters :AppCompatActivity() {
                         //добавление циферки на экран:
                         points[numberOfPoints] = TextView(getApplicationContext())
                         var  txt = numberOfPoints + 1
+
+
                         points[numberOfPoints]!!.setText("" + txt)
                         val id = View.generateViewId()
                         points[numberOfPoints]!!.setId(id)

@@ -31,8 +31,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Filters" />
-        android:screenOrientation="portrait">
+        <activity android:name=".Filters"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
             android:name=".Rotate"
             android:label="@string/title_activity_rotate"
