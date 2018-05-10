@@ -2,7 +2,6 @@ package com.example.lbg99.andrapp
 
 import android.Manifest
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -14,10 +13,6 @@ import kotlinx.android.synthetic.main.app_bar_nav_menu.*
 import android.content.DialogInterface
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
-import android.app.PendingIntent.getActivity
-import android.R.string.cancel
-import android.app.DialogFragment
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -28,20 +23,58 @@ import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.FileProvider
 import android.widget.Toast
-import kotlinx.android.synthetic.main.nav_header_nav_menu.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-
+class BitmapStorage {
+    companion object {
+        private var imageBitmap: Bitmap?=null
+        private var currentPhotoPath: String?=null
+    }
+    fun saveChange() {
+        val root = Environment.getExternalStorageDirectory().toString()
+        val myDir = File(root + "/capture_photo")
+        myDir.mkdirs()
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val OutletFname = "Image-$timeStamp.jpg"
+        val file = File(myDir, OutletFname)
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            currentPhotoPath = file.absolutePath
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    fun setBitmap(newBitmap:Bitmap?){
+        imageBitmap = newBitmap
+    }
+    fun getBitmap(): Bitmap? {
+        return imageBitmap
+    }
+    fun getPath(): String? {
+        return currentPhotoPath
+    }
+    fun setPath(newPath: String?) {
+        currentPhotoPath = newPath
+    }
+    fun init(newBitmap: Bitmap, newPath: String) {
+        setPath(newPath)
+        setBitmap(newBitmap)
+    }
+}
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
-    public var imageBitmap: Bitmap?=null
+    var imageBitmap: Bitmap?=null
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -65,9 +98,6 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_menu)
         setSupportActionBar(toolbar)
-
-
-
         fab.setOnClickListener {
             val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
             val builder = AlertDialog.Builder(this)
@@ -89,12 +119,10 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             saveImage()
             Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
         }
-
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
-
         nav_view.setNavigationItemSelectedListener(this)
     }
 
@@ -126,6 +154,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             out.flush()
             mCurrentPhotoPath = file.absolutePath
             out.close()
+            BitmapStorage().setPath(mCurrentPhotoPath)
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_filter.*
 import kotlinx.android.synthetic.main.app_bar_filter.*
 
@@ -46,6 +47,8 @@ class filter : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
                 for(j in 0 until matrix[i].size)
                     tmp!!.setPixel(i,j,matrix[i][j])
             imageFilter.setImageBitmap(tmp)
+            var path = BitmapStorage().getPath()
+            Toast.makeText(this,path,Toast.LENGTH_SHORT)
         }
 
         inverseBtn.setOnClickListener {
@@ -157,10 +160,11 @@ class filter : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
     }
 
     fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
-        var arr:Array<IntArray>? = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
+        var arr = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
         for(i in 0 until tmpImage!!.width)
-            for(j in 0 until tmpImage!!.height)
-                arr!![i][j]= tmpImage!!.getPixel(i,j)
+            for(j in 0 until tmpImage!!.height) {
+                arr[i][j]= tmpImage!!.getPixel(i,j)
+            }
         pixels = arr // закинули в глобальный массив
     }
     override fun onBackPressed() {
