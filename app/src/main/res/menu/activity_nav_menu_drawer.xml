@@ -5,7 +5,7 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/filter"
+            android:id="@+id/smth"
             android:icon="@drawable/ic_menu_camera"
             android:title="Filters" />
     </group>
@@ -13,9 +13,9 @@
     <item android:title="Other">
         <menu>
             <item
-                android:id="@+id/smth"
+                android:id="@+id/filter"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Fdsfsfs" />
+                android:title="Filters" />
         </menu>
     </item>
 

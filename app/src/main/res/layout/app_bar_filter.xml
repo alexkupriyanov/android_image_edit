@@ -35,35 +35,11 @@
         app:srcCompat="@mipmap/ic_launcher" />
 
     <Button
-        android:id="@+id/sepiaBtn"
+        android:id="@+id/cancelBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sepia"
-        app:layout_anchor="@+id/include2"
-        app:layout_anchorGravity="left|bottom" />
-
-    <Button
-        android:id="@+id/inverseBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Inverse"
+        android:text="@android:string/cancel"
         app:layout_anchor="@+id/include2"
         app:layout_anchorGravity="bottom|center" />
-
-    <Button
-        android:id="@+id/binBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bin"
-        app:layout_anchor="@+id/include2"
-        app:layout_anchorGravity="right|bottom" />
-
-    <Button
-        android:id="@+id/grayBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Gray"
-        app:layout_anchor="@+id/inverseBtn"
-        app:layout_anchorGravity="top|center" />
 
 </android.support.design.widget.CoordinatorLayout>

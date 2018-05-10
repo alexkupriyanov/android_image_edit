@@ -1,6 +1,5 @@
 package com.example.lbg99.andrapp
 
-import android.Manifest
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -13,60 +12,49 @@ import kotlinx.android.synthetic.main.app_bar_nav_menu.*
 import android.content.DialogInterface
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
 import android.widget.Toast
+import kotlinx.android.synthetic.main.nav_header_filter.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class BitmapStorage {
+class commonData {
     companion object {
-        private var imageBitmap: Bitmap?=null
-        private var currentPhotoPath: String?=null
+        var imageBitmap: Bitmap?=null
+        var currentPhotoPath: String?=null
     }
     fun saveChange() {
+        val file = File(currentPhotoPath)
+        if (file.exists()) file.delete()
+        try {
+            val out = FileOutputStream(file)
+            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    fun init(newBitmap: Bitmap) {
+        imageBitmap = newBitmap
         val root = Environment.getExternalStorageDirectory().toString()
         val myDir = File(root + "/capture_photo")
         myDir.mkdirs()
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val OutletFname = "Image-$timeStamp.jpg"
         val file = File(myDir, OutletFname)
-        if (file.exists()) file.delete()
-        try {
-            val out = FileOutputStream(file)
-            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-            out.flush()
-            currentPhotoPath = file.absolutePath
-            out.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-    fun setBitmap(newBitmap:Bitmap?){
-        imageBitmap = newBitmap
-    }
-    fun getBitmap(): Bitmap? {
-        return imageBitmap
-    }
-    fun getPath(): String? {
-        return currentPhotoPath
-    }
-    fun setPath(newPath: String?) {
-        currentPhotoPath = newPath
-    }
-    fun init(newBitmap: Bitmap, newPath: String) {
-        setPath(newPath)
-        setBitmap(newBitmap)
+        currentPhotoPath = file.absolutePath
+        saveChange()
     }
 }
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -111,12 +99,13 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                         if (which == 1) {
                             photoFromGallery()
                         }
+                        commonData().saveChange()
                     })
             builder.show()
         }
-        imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
+        commonData().init( as Bitmap)
         saveBtn.setOnClickListener {
-            saveImage()
+            commonData().saveChange()
             Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
         }
         val toggle = ActionBarDrawerToggle(
@@ -134,31 +123,6 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         }
     }
 
-    fun saveImage() {
-        if (ActivityCompat.checkSelfPermission(applicationContext,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this@nav_menu,
-                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 102)
-        }
-        val root = Environment.getExternalStorageDirectory().toString()
-        val myDir = File(root + "/capture_photo")
-        myDir.mkdirs()
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val OutletFname = "Image-$timeStamp.jpg"
-        val file = File(myDir, OutletFname)
-        if (file.exists()) file.delete()
-        try {
-            val out = FileOutputStream(file)
-            imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
-            imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-            out.flush()
-            mCurrentPhotoPath = file.absolutePath
-            out.close()
-            BitmapStorage().setPath(mCurrentPhotoPath)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
     private fun takeAndSetPhoto(){
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -204,11 +168,6 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         menuInflater.inflate(R.menu.nav_menu, menu)
         return true
     }
-    fun randomMe () {
-        val randomIntent = Intent(this, filter::class.java)
-        randomIntent.putExtra(filter.absolutePath,mCurrentPhotoPath)
-        startActivity(randomIntent)
-    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -226,9 +185,8 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.smth -> {
-                saveImage()
-                randomMe()
+            R.id.filter -> {
+                startActivity(Intent(this, filter::class.java))
             }
 
         }
