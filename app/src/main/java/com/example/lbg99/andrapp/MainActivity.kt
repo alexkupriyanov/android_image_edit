@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
         saveBtn.setOnClickListener {
-           saveImage()
+            saveImage()
             Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         val randomIntent = Intent(this, Filters::class.java)
         randomIntent.putExtra(Filters.absolutePath,mCurrentPhotoPath)
         startActivity(randomIntent)
-     }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {

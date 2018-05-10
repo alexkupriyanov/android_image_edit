@@ -8,9 +8,7 @@ import kotlin.math.*
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import android.graphics.Canvas
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.*
 import android.widget.TextView
 //import sun.swing.SwingUtilities2.drawRect
@@ -68,13 +66,13 @@ class Filters :AppCompatActivity() {
                 for(j in 0 until tmpImage!!.height)
                 {
                     val color = matrix!![i][j]
-                val r = 255 - Color.red(color)
-                val g = 255 - Color.green(color)
-                val b = 255 - Color.blue(color)
-                val a = 255
-                val p = a shl 24 or (r shl 16) or (g shl 8) or b
-                matrix[i][j] = p
-            }
+                    val r = 255 - Color.red(color)
+                    val g = 255 - Color.green(color)
+                    val b = 255 - Color.blue(color)
+                    val a = 255
+                    val p = a shl 24 or (r shl 16) or (g shl 8) or b
+                    matrix[i][j] = p
+                }
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             for(i in 0 until matrix!!.size)
                 for(j in 0 until matrix[i].size)
@@ -90,32 +88,32 @@ class Filters :AppCompatActivity() {
             var Y: Double
             var I: Double
             var Q: Double
-             var matrix = pixels
+            var matrix = pixels
             for (i in 0 until tmpImage!!.width)
                 for(j in 0 until tmpImage!!.height)
                 {
                     val color = matrix!![i][j]
-                r = Color.red(color)
-                g = Color.green(color)
-                b = Color.blue(color)
-                Y = 0.299 * r + 0.587 * g + 0.114 * b
-                I = 1.0
-                Q = 0.0
-                //Transform to RGB
-                r = (1.0 * Y + 0.999 * I + 0.621 * Q).toInt()
-                g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
-                b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
-                //Fix values
-                r = if (r < 0) 0 else r
-                r = if (r > 255) 255 else r
-                g = if (g < 0) 0 else g
-                g = if (g > 255) 255 else g
-                b = if (b < 0) 0 else b
-                b = if (b > 255) 255 else b
-                val a = 255
-                val p = a shl 24 or (r shl 16) or (g shl 8) or b
-                matrix[i][j] = p
-            }
+                    r = Color.red(color)
+                    g = Color.green(color)
+                    b = Color.blue(color)
+                    Y = 0.299 * r + 0.587 * g + 0.114 * b
+                    I = 1.0
+                    Q = 0.0
+                    //Transform to RGB
+                    r = (1.0 * Y + 0.999 * I + 0.621 * Q).toInt()
+                    g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
+                    b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
+                    //Fix values
+                    r = if (r < 0) 0 else r
+                    r = if (r > 255) 255 else r
+                    g = if (g < 0) 0 else g
+                    g = if (g > 255) 255 else g
+                    b = if (b < 0) 0 else b
+                    b = if (b > 255) 255 else b
+                    val a = 255
+                    val p = a shl 24 or (r shl 16) or (g shl 8) or b
+                    matrix[i][j] = p
+                }
             var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             for(i in 0 until matrix!!.size)
                 for(j in 0 until matrix[i].size)
@@ -131,33 +129,33 @@ class Filters :AppCompatActivity() {
             var Y: Double
             var I: Double
             var Q: Double
-             var matrix = pixels
+            var matrix = pixels
             for (i in 0 until tmpImage!!.width)
                 for(j in 0 until tmpImage!!.height)
                 {
                     val color = matrix!![i][j]
-                r = Color.red(color)
-                g = Color.green(color)
-                b = Color.blue(color)
-                Y = 0.299 * r + 0.587 * g + 0.114 * b
-                I = 51.0
-                Q = 0.0
-                //Transform to RGB
-                r = (1.0 * Y + 0.999 * I + 0.621 * Q).toInt()
-                g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
-                b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
-                //Fix values
-                r = if (r < 0) 0 else r
-                r = if (r > 255) 255 else r
-                g = if (g < 0) 0 else g
-                g = if (g > 255) 255 else g
-                b = if (b < 0) 0 else b
-                b = if (b > 255) 255 else b
-                val a = 255
-                val p = a shl 24 or (r shl 16) or (g shl 8) or b
-                matrix[i][j] = p
-            }
-           var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
+                    r = Color.red(color)
+                    g = Color.green(color)
+                    b = Color.blue(color)
+                    Y = 0.299 * r + 0.587 * g + 0.114 * b
+                    I = 51.0
+                    Q = 0.0
+                    //Transform to RGB
+                    r = (1.0 * Y + 0.999 * I + 0.621 * Q).toInt()
+                    g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
+                    b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
+                    //Fix values
+                    r = if (r < 0) 0 else r
+                    r = if (r > 255) 255 else r
+                    g = if (g < 0) 0 else g
+                    g = if (g > 255) 255 else g
+                    b = if (b < 0) 0 else b
+                    b = if (b > 255) 255 else b
+                    val a = 255
+                    val p = a shl 24 or (r shl 16) or (g shl 8) or b
+                    matrix[i][j] = p
+                }
+            var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
             for(i in 0 until matrix!!.size)
                 for(j in 0 until matrix[i].size)
                     tmp!!.setPixel(i,j,matrix[i][j])
@@ -165,10 +163,10 @@ class Filters :AppCompatActivity() {
 
         }
 
-            gaussbutton.setOnClickListener{
-                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3,0.0,2.0))
+        gaussbutton.setOnClickListener{
+            Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3,0.0,2.0))
 
-               }
+        }
         seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 // Write code to perform some action when progress is changed.
@@ -185,7 +183,7 @@ class Filters :AppCompatActivity() {
                 try {
                     Rotate(value)
                 } catch (e: OutOfMemoryError) { //если недостаточно памяти
-                    Toast.makeText(applicationContext, "Недостаточно памяти для выполнения операции", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Мало памятидля выполнения действия", Toast.LENGTH_SHORT).show()
                 }
 
                 val imageview = findViewById(R.id.Image) as ImageView
@@ -196,7 +194,7 @@ class Filters :AppCompatActivity() {
 
 
 
-})
+        })
         trigl.setOnClickListener{
             workWithTriangles()
         }
@@ -232,7 +230,7 @@ class Filters :AppCompatActivity() {
         for (x in -radius until radius) {
             for (y in -radius until radius) {
                 weights[x1][y1] = (Math.pow (Math.E, (-((x*x+y*y)/(2*radius*radius))).toDouble())) / (2*PI*radius*radius)
-               // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
                 sum += weights[x1][y1]
                 y1++
             }
@@ -259,21 +257,21 @@ class Filters :AppCompatActivity() {
                     }
                 }
 
-               var R = (sumR/sum).toInt()
+                var R = (sumR/sum).toInt()
                 if (R < 0) {
                     R = 0
                 } else if (R > 255) {
                     R = 255
                 }
-                                                // получаем итоговые цвета
-               var G = (sumG/sum).toInt()
+                // получаем итоговые цвета
+                var G = (sumG/sum).toInt()
                 if (G < 0) {
                     G = 0
                 } else if (G > 255) {
                     G = 255
                 }
 
-              var  B = (sumB/sum).toInt()
+                var  B = (sumB/sum).toInt()
                 if (B < 0) {
                     B = 0
                 } else if (B > 255) {
@@ -294,23 +292,22 @@ class Filters :AppCompatActivity() {
                 }
                 result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B));
             }
-            }
+        }
 
         //imageview.setImageBitmap(result)
         return result
     }
 
 
-    /** Поворачивает изображение  */
+    // Функция поворота
     fun Rotate(value: Double) {
         var value = value
         value = Math.toRadians(value)
-        //инициализация переменных перед преобазованием
         val w = tmpImage!!.width
         val h = tmpImage!!.height
         val pixels = IntArray(w * h)
         tmpImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
-        //поворот currentBitmap
+        //поворот Bitmap
         tmpImage = rotate(value, w, h, pixels)
     }
 
@@ -330,17 +327,17 @@ class Filters :AppCompatActivity() {
         val imageview = findViewById<View>(R.id.Image) as ImageView
         numberOfPoints = 0
         val textview = findViewById<View>(R.id.text) as TextView
-        textview.text = "Назначьте три точки исходного треугольника [1-2-3]"
+        textview.text = "Выберите три точки начального треугольника"
         imageview.setOnTouchListener(object : View.OnTouchListener {
             var points = arrayOfNulls<TextView>(6)
             var pointsX = DoubleArray(6)
             var pointsY = DoubleArray(6)
             internal var ids = IntArray(6)
             override fun onTouch(v: View, event: MotionEvent): Boolean { //при касании
-                if (event.action == MotionEvent.ACTION_UP) { //в момент прекращения касания
-                    if (numberOfPoints < 6) { //если меньше шести точек
-                        //сохранение координат:
-                        val x = event.x.toInt()
+                if (event.action == MotionEvent.ACTION_UP) {
+                    if (numberOfPoints < 6) { // если ещё не все точки назначены
+
+                        val x = event.x.toInt()//запомним координаты
                         val y = event.y.toInt()
                         pointsX[numberOfPoints] = x.toDouble()
                         pointsY[numberOfPoints] = y.toDouble()
@@ -360,15 +357,15 @@ class Filters :AppCompatActivity() {
 
                         numberOfPoints++
                     }
-                    //обновление текста после ввода трёх точек
+                    //после того, как ввели первые точки, меняем надпись
                     if (numberOfPoints == 3) {
-                        textview.text = "Назначьте три точки конечного треугольника [4-5-6]"
+                        textview.text = "Выберите три точки итогового тругольника"
                     }
                     //вычисление коэффициентов после ввода шести точек
                     if (numberOfPoints == 6) {
                         textview.text = "" //удаление текстовой подсказки
 
-                            triangl(pointsX, pointsY)
+                        triangl(pointsX, pointsY)
 
 
                         imageview.setImageBitmap(tmpImage)
@@ -379,27 +376,34 @@ class Filters :AppCompatActivity() {
                 return true
             }
         })
+
     }
 
-    fun triangl(pointsX: DoubleArray, pointsY: DoubleArray) {
-        //вычисление элементов матрицы (мне тоже страшно от этого кода)
-        var delta = pointsX[0] * pointsY[1] + pointsX[1] * pointsY[2] + pointsX[2] * pointsY[0] - pointsX[2] * pointsY[1] - pointsX[1] * pointsY[0] - pointsX[0] * pointsY[2]
-        var delta_a11 = pointsX[3] * pointsY[1] + pointsX[4] * pointsY[2] + pointsX[5] * pointsY[0] - pointsX[5] * pointsY[1] - pointsX[4] * pointsY[0] - pointsX[3] * pointsY[2]
-        var delta_a21 = pointsX[0] * pointsX[4] + pointsX[1] * pointsX[5] + pointsX[2] * pointsX[3] - pointsX[2] * pointsX[4] - pointsX[1] * pointsX[3] - pointsX[0] * pointsX[5]
-        var delta_a31 = pointsX[0] * pointsY[1] * pointsX[5] + pointsX[1] * pointsY[2] * pointsX[3] + pointsX[2] * pointsY[0] * pointsX[4] -
-                pointsX[2] * pointsY[1] * pointsX[3] - pointsX[1] * pointsY[0] * pointsX[5] - pointsX[0] * pointsY[2] * pointsX[4]
-        var delta_a12 = pointsY[3] * pointsY[1] + pointsY[4] * pointsY[2] + pointsY[5] * pointsY[0] - pointsY[5] * pointsY[1] - pointsY[4] * pointsY[0] - pointsY[3] * pointsY[2]
-        var delta_a22 = pointsX[0] * pointsY[4] + pointsX[1] * pointsY[5] + pointsX[2] * pointsY[3] - pointsX[2] * pointsY[4] - pointsX[1] * pointsY[3] - pointsX[0] * pointsY[5]
-        var delta_a32 = pointsX[0] * pointsY[1] * pointsY[5] + pointsX[1] * pointsY[2] * pointsY[3] + pointsX[2] * pointsY[0] * pointsY[4] -
-                pointsX[2] * pointsY[1] * pointsY[3] - pointsX[1] * pointsY[0] * pointsY[5] - pointsX[0] * pointsY[2] * pointsY[4]
+    fun triangl(coordX: DoubleArray, coordY: DoubleArray) {
+        //вичислим дельту, чтобы решить систему уравнений, узнать коэффициенты матрицы преобразований
+        var delta = coordX[0] * coordY[1] + coordX[1] * coordY[2] + coordX[2] * coordY[0] - coordX[2] * coordY[1] - coordX[1] * coordY[0] - coordX[0] * coordY[2]
+
+
+        //выглядит громоздко, но просто по формуле считаем для каждого коэф-фа дельту по формуле
+        var delta_a11 = coordX[3] * coordY[1] + coordX[4] * coordY[2] + coordX[5] * coordY[0] - coordX[5] * coordY[1] - coordX[4] * coordY[0] - coordX[3] * coordY[2]
+        var delta_a21 = coordX[0] * coordX[4] + coordX[1] * coordX[5] + coordX[2] * coordX[3] - coordX[2] * coordX[4] - coordX[1] * coordX[3] - coordX[0] * coordX[5]
+        var delta_a31 = coordX[0] * coordY[1] * coordX[5] + coordX[1] * coordY[2] * coordX[3] + coordX[2] * coordY[0] * coordX[4] - coordX[2] * coordY[1] * coordX[3] - coordX[1] * coordY[0] * coordX[5] - coordX[0] * coordY[2] * coordX[4]
+        var delta_a12 = coordY[3] * coordY[1] + coordY[4] * coordY[2] + coordY[5] * coordY[0] - coordY[5] * coordY[1] - coordY[4] * coordY[0] - coordY[3] * coordY[2]
+        var delta_a22 = coordX[0] * coordY[4] + coordX[1] * coordY[5] + coordX[2] * coordY[3] - coordX[2] * coordY[4] - coordX[1] * coordY[3] - coordX[0] * coordY[5]
+        var delta_a32 = coordX[0] * coordY[1] * coordY[5] + coordX[1] * coordY[2] * coordY[3] + coordX[2] * coordY[0] * coordY[4] - coordX[2] * coordY[1] * coordY[3] - coordX[1] * coordY[0] * coordY[5] - coordX[0] * coordY[2] * coordY[4]
+
+
         var a11 = (delta_a11.toDouble() / delta.toDouble())
         var a21 = delta_a21 / delta
         var a31 = delta_a31 / delta
         var a12 = delta_a12 / delta
         var a22 = delta_a22 / delta
         var a32 = delta_a32 / delta
+
+        //посчитали детерминатн матрицы
         var detM = a11 * a22 - a12 * a21
-        //вычисление коэффициентов по числам в матрице, формулы с хабра
+
+        //вычисление коэффициентов с помощью формулы  https://habr.com/post/278597/
         val alpha: Double
         var sy: Double
         var sx: Double
@@ -408,28 +412,37 @@ class Filters :AppCompatActivity() {
         if (a22 == 0.0) {
             alpha = Math.PI / 2
             sy = (-a21).toDouble()
-        } else {
+        }
+        else {
             alpha = Math.atan((-a21 / a22).toDouble())
             sy = a22 / Math.cos(alpha)
         }
+
         sx = detM / sy
-        if(detM==0.0) detM=1.0
+
+        if(detM==0.0) detM=1.0 //что бы не делить на 0, это, конечно, не особо возможно
+                              //но мало ли...
+
         hx = ((a11 * a21 + a12 * a22) / detM).toDouble()
-        //инициализация переменных перед преобазованием
+
         val w = tmpImage!!.width
         val h = tmpImage!!.height
         val pixel = IntArray(w * h)
         tmpImage!!.getPixels(pixel, 0, w, 0, 0, w, h)
-        //растяжение/сжатие
+
+        //либо билинейное, либо трилинейное растяжение сжатие
         var newPixels: IntArray
         if (Math.abs(sx) * Math.abs(sy) > 1) {
             newPixels = bilinear(sx, sy, w, h, pixel)
-        } else {
+        }
+        else {
             newPixels = trilinear(sx, sy, w, h, pixel)
         }
+
         var w2 = Math.abs((w * sx).toInt())
         var h2 = Math.abs((h * sy).toInt())
-        //сдвиг
+
+        //вызов функции перемещения изображения
         newPixels = move(hx, 0.0, w2, h2, newPixels)
         //поворот
         var temp = rotate(alpha, w2, h2, newPixels)
@@ -437,10 +450,12 @@ class Filters :AppCompatActivity() {
         var h3 = temp.height
         var tempPixels = IntArray(w3 * h3)
         temp.getPixels(tempPixels, 0, w3, 0, 0, w3, h3)
-        //обновление currentBitmap
+
+        //закинули в Bitmap
         tmpImage = Bitmap.createBitmap(tempPixels, w3, h3, Bitmap.Config.ARGB_8888)
     }
 
+    // описание функции перемещения
     fun move(tx: Double, ty: Double, w: Int, h: Int, pixels: IntArray): IntArray {
         var moveX = tx.toInt()
         var moveY = ty.toInt()
@@ -449,7 +464,8 @@ class Filters :AppCompatActivity() {
             for (j in 0 until w) {
                 if (i - moveY < h && i - moveY >= 0 && j - moveX < w && j - moveX >= 0) {
                     newPixels[i * w + j] = pixels[(i - moveY) * w + (j - moveX)]
-                } else {
+                }
+                else {
                     newPixels[i * w + j] = 0x00ffffff
                 }
             }
@@ -457,10 +473,12 @@ class Filters :AppCompatActivity() {
         return newPixels
     }
 
+    // а вот и билинейная
     fun bilinear(sx: Double, sy: Double, w: Int, h: Int, pixels: IntArray): IntArray {
         var sx = sx
         var sy = sy
         var pixels = pixels
+
         if (sx < 0) {
             pixels = verticalFlip(w, h, pixels)
             sx = -sx
@@ -469,17 +487,22 @@ class Filters :AppCompatActivity() {
             pixels = horizontalFlip(w, h, pixels)
             sy = -sy
         }
+
         var w2 = (w * sx).toInt()
         var h2 = (h * sy).toInt()
         var newPixels = IntArray(w2 * h2)
+
         var x_diff: Double
         var y_diff: Double
+
         var A: Int
         var B: Int
         var C: Int
         var D: Int
+
         var x: Int
         var y: Int
+
         var Agreen: Int
         var Ablue: Int
         var Ared: Int
@@ -492,22 +515,26 @@ class Filters :AppCompatActivity() {
         var Dgreen: Int
         var Dblue: Int
         var Dred: Int
+
         var newGreen: Int
         var newBlue: Int
         var newRed: Int
-        val newAlpha: Int
+
         sx = 1 / sx
         sy = 1 / sy
         for (i in 0 until h2) {
             for (j in 0 until w2) {
                 y = (sy * i).toInt()
                 x = (sx * j).toInt()
+
                 x_diff = sx * j - x
                 y_diff = sy * i - y
+
                 A = pixels[y * w + x]
                 B = pixels[y * w + (x + 1) % w]
                 C = pixels[(y + 1) % h * w + x]
                 D = pixels[(y + 1) % h * w + (x + 1) % w]
+
                 Ared = (A and 0x00ff0000) / 65536
                 Agreen = (A and 0x0000ff00) / 256
                 Ablue = A and 0x000000ff
@@ -520,6 +547,7 @@ class Filters :AppCompatActivity() {
                 Dred = (D and 0x00ff0000) / 65536
                 Dgreen = (D and 0x0000ff00) / 256
                 Dblue = D and 0x000000ff
+
                 newRed = (Ared.toDouble() * (1 - x_diff) * (1 - y_diff) + Bred.toDouble() * x_diff * (1 - y_diff) + Cred.toDouble() * (1 - x_diff) * y_diff + Dred.toDouble() * x_diff * y_diff).toInt()
                 newGreen = (Agreen.toDouble() * (1 - x_diff) * (1 - y_diff) + Bgreen.toDouble() * x_diff * (1 - y_diff) + Cgreen.toDouble() * (1 - x_diff) * y_diff + Dgreen.toDouble() * x_diff * y_diff).toInt()
                 newBlue = (Ablue.toDouble() * (1 - x_diff) * (1 - y_diff) + Bblue.toDouble() * x_diff * (1 - y_diff) + Cblue.toDouble() * (1 - x_diff) * y_diff + Dblue.toDouble() * x_diff * y_diff).toInt()
@@ -544,14 +572,17 @@ class Filters :AppCompatActivity() {
         val pixels2 = bilinear(0.5, 0.5, w, h, pixels)
         val w2 = (w * 0.5).toInt()
         val h2 = (h * 0.5).toInt()
+
         val width = (w * sx).toInt()
         val height = (h * sy).toInt()
         val newPixels = IntArray(width * height)
+
         val w_ratio = ((w - 1).toFloat() / width).toDouble()
         val h_ratio = ((h - 1).toFloat() / height).toDouble()
         val w2_ratio = ((w2 - 1).toFloat() / width).toDouble()
         val h2_ratio = ((h2 - 1).toFloat() / height).toDouble()
         val h3_diff = ((w - width) / (w - w2).toFloat()).toDouble()
+
         var x: Double
         var y: Double
         var w_diff: Double
@@ -560,6 +591,7 @@ class Filters :AppCompatActivity() {
         var y2: Double
         var w2_diff: Double
         var h2_diff: Double
+
         var A: Int
         var B: Int
         var C: Int
@@ -568,9 +600,11 @@ class Filters :AppCompatActivity() {
         var F: Int
         var G: Int
         var H: Int
+
         var index: Int
         var index2: Int
-        var indexNew: Int
+        var new_i: Int
+
         var Ared: Int
         var Agreen: Int
         var Ablue: Int
@@ -595,31 +629,37 @@ class Filters :AppCompatActivity() {
         var Hred: Int
         var Hgreen: Int
         var Hblue: Int
-        val newAlpha: Int
+
         var newRed: Int
         var newGreen: Int
         var newBlue: Int
+
         for (i in 0 until height) {
             for (j in 0 until width) {
-                indexNew = i * width + j
+                new_i = i * width + j
                 x = w_ratio * j
                 y = h_ratio * i
+
                 w_diff = x - x.toInt()
                 h_diff = y - y.toInt()
                 index = y.toInt() * w + x.toInt()
+
                 A = pixels[index]
                 B = pixels[(index + 1) % (w * h)]
                 C = pixels[(index + w) % (w * h)]
                 D = pixels[(index + w + 1) % (w * h)]
+
                 x2 = w2_ratio * j
                 y2 = h2_ratio * i
                 w2_diff = x2 - x2.toInt()
                 h2_diff = y2 - y2.toInt()
+
                 index2 = y2.toInt() * w2 + x2.toInt()
                 E = pixels2[index2]
                 F = pixels2[(index2 + 1) % (w2 * h2)]
                 G = pixels2[(index2 + w) % (w2 * h2)]
                 H = pixels2[(index2 + w + 1) % (w2 * h2)]
+
                 Ared = (A and 0x00ff0000) / 65536
                 Agreen = (A and 0x0000ff00) / 256
                 Ablue = A and 0x000000ff
@@ -644,37 +684,31 @@ class Filters :AppCompatActivity() {
                 Hred = (H and 0x00ff0000) / 65536
                 Hgreen = (H and 0x0000ff00) / 256
                 Hblue = H and 0x000000ff
-                newRed = (Ared.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) +
-                        Bred.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
-                        Cred.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) +
-                        Dred.toDouble() * w_diff * h_diff * (1 - h3_diff) +
-                        Ered.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff +
-                        Fred.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
-                        Gred.toDouble() * (1 - w2_diff) * h2_diff * h3_diff +
-                        Hred.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
-                newGreen = (Agreen.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) +
-                        Bgreen.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
-                        Cgreen.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) +
-                        Dgreen.toDouble() * w_diff * h_diff * (1 - h3_diff) +
-                        Egreen.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff +
-                        Fgreen.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
-                        Ggreen.toDouble() * (1 - w2_diff) * h2_diff * h3_diff +
-                        Hgreen.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
-                newBlue = (Ablue.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) +
-                        Bblue.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
-                        Cblue.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) +
-                        Dblue.toDouble() * w_diff * h_diff * (1 - h3_diff) +
-                        Eblue.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff +
-                        Fblue.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
-                        Gblue.toDouble() * (1 - w2_diff) * h2_diff * h3_diff +
-                        Hblue.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
-                newPixels[indexNew] = 255 * 16777216 + newRed * 65536 + newGreen * 256 + newBlue
+
+                //наконец получаем три итоговых значения
+                newRed = (Ared.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) + Bred.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
+                        Cred.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) + Dred.toDouble() * w_diff * h_diff * (1 - h3_diff) +
+                        Ered.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff + Fred.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
+                        Gred.toDouble() * (1 - w2_diff) * h2_diff * h3_diff + Hred.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
+
+                newGreen = (Agreen.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) + Bgreen.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
+                        Cgreen.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) + Dgreen.toDouble() * w_diff * h_diff * (1 - h3_diff) +
+                        Egreen.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff + Fgreen.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
+                        Ggreen.toDouble() * (1 - w2_diff) * h2_diff * h3_diff + Hgreen.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
+
+                newBlue = (Ablue.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) + Bblue.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
+                        Cblue.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) + Dblue.toDouble() * w_diff * h_diff * (1 - h3_diff) +
+                        Eblue.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff + Fblue.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
+                        Gblue.toDouble() * (1 - w2_diff) * h2_diff * h3_diff + Hblue.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
+
+                // и записываем их
+                newPixels[new_i] = 255 * 16777216 + newRed * 65536 + newGreen * 256 + newBlue
             }
         }
         return newPixels
     }
 
-    /** переворачивает currentBitmap по вертикали  */
+    //поворот по вертикали
     fun verticalFlip(w: Int, h: Int, pixels: IntArray): IntArray {
         val newPixels = IntArray(w * h)
         for (i in 0 until h) {
@@ -685,7 +719,7 @@ class Filters :AppCompatActivity() {
         return newPixels
     }
 
-    /** переворачивает currentBitmap по горизонтали  */
+    //поворот по горизонтали
     fun horizontalFlip(w: Int, h: Int, pixels: IntArray): IntArray {
         val newPixels = IntArray(w * h)
         for (i in 0 until h) {

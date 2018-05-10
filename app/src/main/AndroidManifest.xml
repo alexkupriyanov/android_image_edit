@@ -31,17 +31,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Filters"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name=".Rotate"
-            android:label="@string/title_activity_rotate"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".biliner_trilinear"
-            android:label="@string/title_activity_biliner_trilinear"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".Filters"></activity>
+        android:screenOrientation="portrait">
     </application>
 
 </manifest>
