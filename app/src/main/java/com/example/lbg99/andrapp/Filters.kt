@@ -347,7 +347,6 @@ class Filters :AppCompatActivity() {
     private lateinit var background: Canvass
     @SuppressLint("ClickableViewAccessibility")
     fun workWithTriangles() {
-        // инициализация
         val imageview = findViewById<View>(R.id.Image) as ImageView
         numberOfPoints = 0
         val textview = findViewById<View>(R.id.text) as TextView
@@ -361,7 +360,6 @@ class Filters :AppCompatActivity() {
             override fun onTouch(v: View, event: MotionEvent): Boolean { //при касании
                 if (event.action == MotionEvent.ACTION_UP) { //в момент прекращения касания
                     if (numberOfPoints < 6) { //если меньше шести точек
-                        //сохранение координат:
                         val x = event.x.toInt()
                         val y = event.y.toInt()
                         corx= x.toFloat()
@@ -371,15 +369,9 @@ class Filters :AppCompatActivity() {
                         //добавление циферки на экран:
                         points[numberOfPoints] = TextView(getApplicationContext())
                         var  txt = numberOfPoints + 1
-                        point.x=x
-                        point.y=y
                         val layout1 = findViewById(R.id.layout1) as android.support.constraint.ConstraintLayout
                         val canvass = Canvass(getApplicationContext())
                         layout1.addView(canvass)
-                        /*points[numberOfPoints]!!.setText("" + txt)
-                        val id = View.generateViewId()
-                        points[numberOfPoints]!!.setId(id)
-                        ids[numberOfPoints] = id*/
 
                         numberOfPoints++
                     }
