@@ -381,7 +381,7 @@ class Filters :AppCompatActivity() {
                     }
                     //вычисление коэффициентов после ввода шести точек
                     if (numberOfPoints == 6) {
-                        textview.text = "" //удаление текстовой подсказки
+                        textview.text = ""
 
                             triangl(pointsX, pointsY)
 
