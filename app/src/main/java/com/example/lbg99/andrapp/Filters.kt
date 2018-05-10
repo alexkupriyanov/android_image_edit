@@ -1,39 +1,21 @@
 package com.example.lbg99.andrapp
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import com.example.lbg99.andrapp.R.id.*
-import android.support.v7.app.AlertDialog
 //import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
 import kotlinx.android.synthetic.main.activity_filters.*
-import kotlinx.android.synthetic.main.activity_filters.view.*
-import java.io.IOException
 import kotlin.math.*
-import kotlin.text.Typography.half
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
-import java.util.Collections.rotate
-import android.widget.SeekBar.OnSeekBarChangeListener
-import android.content.DialogInterface
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import android.R.attr.y
-import android.R.attr.x
 import android.annotation.SuppressLint
-import java.util.Collections.rotate
-import android.opengl.ETC1.getHeight
-import android.opengl.ETC1.getWidth
-import android.os.Build
-import android.support.annotation.RequiresApi
-import java.nio.file.Files.move
+import android.widget.TextView
+
+
 
 
 class Filters :AppCompatActivity() {
@@ -330,8 +312,7 @@ class Filters :AppCompatActivity() {
         tmpImage = rotate(value, w, h, pixels)
     }
 
-    /** повораичвает изображение на заданный угол  */
-    //сейчас использует встроенные средства; возможно, это надо исправить
+
     fun rotate(alpha: Double, w: Int, h: Int, pixels: IntArray): Bitmap {
         val matrix = Matrix()
         matrix.postRotate(Math.toDegrees(alpha).toFloat())
@@ -341,9 +322,7 @@ class Filters :AppCompatActivity() {
     }
     var numberOfPoints: Int = 0
     @SuppressLint("ClickableViewAccessibility")
-    internal var pointsX = IntArray(6)
-    internal var pointsY = IntArray(6)
-    @SuppressLint("ClickableViewAccessibility")
+
     fun workWithTriangles() {
         // инициализация
         val imageview = findViewById<View>(R.id.Image) as ImageView
@@ -352,7 +331,8 @@ class Filters :AppCompatActivity() {
         textview.text = "Назначьте три точки исходного треугольника [1-2-3]"
         imageview.setOnTouchListener(object : View.OnTouchListener {
             internal var points = arrayOfNulls<TextView>(6)
-
+            var pointsX = DoubleArray(6)
+            var pointsY = DoubleArray(6)
             internal var ids = IntArray(6)
             override fun onTouch(v: View, event: MotionEvent): Boolean { //при касании
                 if (event.action == MotionEvent.ACTION_UP) { //в момент прекращения касания
@@ -360,8 +340,8 @@ class Filters :AppCompatActivity() {
                         //сохранение координат:
                         val x = event.x.toInt()
                         val y = event.y.toInt()
-                        pointsX[numberOfPoints] = x
-                        pointsY[numberOfPoints] = y
+                        pointsX[numberOfPoints] = x.toDouble()
+                        pointsY[numberOfPoints] = y.toDouble()
                         //добавление циферки на экран:
                         points[numberOfPoints] = TextView(getApplicationContext())
                         var  txt = numberOfPoints + 1
@@ -397,31 +377,31 @@ class Filters :AppCompatActivity() {
         })
     }
 
-    fun triangl(pointsX:IntArray, pointsY:IntArray) {
+    fun triangl(pointsX: DoubleArray, pointsY: DoubleArray) {
         //вычисление элементов матрицы (мне тоже страшно от этого кода)
-        val delta = pointsX[0] * pointsY[1] + pointsX[1] * pointsY[2] + pointsX[2] * pointsY[0] - pointsX[2] * pointsY[1] - pointsX[1] * pointsY[0] - pointsX[0] * pointsY[2]
-        val delta_a11 = pointsX[3] * pointsY[1] + pointsX[4] * pointsY[2] + pointsX[5] * pointsY[0] - pointsX[5] * pointsY[1] - pointsX[4] * pointsY[0] - pointsX[3] * pointsY[2]
-        val delta_a21 = pointsX[0] * pointsX[4] + pointsX[1] * pointsX[5] + pointsX[2] * pointsX[3] - pointsX[2] * pointsX[4] - pointsX[1] * pointsX[3] - pointsX[0] * pointsX[5]
-        val delta_a31 = pointsX[0] * pointsY[1] * pointsX[5] + pointsX[1] * pointsY[2] * pointsX[3] + pointsX[2] * pointsY[0] * pointsX[4] -
+        var delta = pointsX[0] * pointsY[1] + pointsX[1] * pointsY[2] + pointsX[2] * pointsY[0] - pointsX[2] * pointsY[1] - pointsX[1] * pointsY[0] - pointsX[0] * pointsY[2]
+        var delta_a11 = pointsX[3] * pointsY[1] + pointsX[4] * pointsY[2] + pointsX[5] * pointsY[0] - pointsX[5] * pointsY[1] - pointsX[4] * pointsY[0] - pointsX[3] * pointsY[2]
+        var delta_a21 = pointsX[0] * pointsX[4] + pointsX[1] * pointsX[5] + pointsX[2] * pointsX[3] - pointsX[2] * pointsX[4] - pointsX[1] * pointsX[3] - pointsX[0] * pointsX[5]
+        var delta_a31 = pointsX[0] * pointsY[1] * pointsX[5] + pointsX[1] * pointsY[2] * pointsX[3] + pointsX[2] * pointsY[0] * pointsX[4] -
                 pointsX[2] * pointsY[1] * pointsX[3] - pointsX[1] * pointsY[0] * pointsX[5] - pointsX[0] * pointsY[2] * pointsX[4]
-        val delta_a12 = pointsY[3] * pointsY[1] + pointsY[4] * pointsY[2] + pointsY[5] * pointsY[0] - pointsY[5] * pointsY[1] - pointsY[4] * pointsY[0] - pointsY[3] * pointsY[2]
-        val delta_a22 = pointsX[0] * pointsY[4] + pointsX[1] * pointsY[5] + pointsX[2] * pointsY[3] - pointsX[2] * pointsY[4] - pointsX[1] * pointsY[3] - pointsX[0] * pointsY[5]
-        val delta_a32 = pointsX[0] * pointsY[1] * pointsY[5] + pointsX[1] * pointsY[2] * pointsY[3] + pointsX[2] * pointsY[0] * pointsY[4] -
+        var delta_a12 = pointsY[3] * pointsY[1] + pointsY[4] * pointsY[2] + pointsY[5] * pointsY[0] - pointsY[5] * pointsY[1] - pointsY[4] * pointsY[0] - pointsY[3] * pointsY[2]
+        var delta_a22 = pointsX[0] * pointsY[4] + pointsX[1] * pointsY[5] + pointsX[2] * pointsY[3] - pointsX[2] * pointsY[4] - pointsX[1] * pointsY[3] - pointsX[0] * pointsY[5]
+        var delta_a32 = pointsX[0] * pointsY[1] * pointsY[5] + pointsX[1] * pointsY[2] * pointsY[3] + pointsX[2] * pointsY[0] * pointsY[4] -
                 pointsX[2] * pointsY[1] * pointsY[3] - pointsX[1] * pointsY[0] * pointsY[5] - pointsX[0] * pointsY[2] * pointsY[4]
-        val a11 = delta_a11 / delta
-        val a21 = delta_a21 / delta
-        val a31 = delta_a31 / delta
-        val a12 = delta_a12 / delta
-        val a22 = delta_a22 / delta
-        val a32 = delta_a32 / delta
-        val detM = a11 * a22 - a12 * a21
+        var a11 = (delta_a11.toDouble() / delta.toDouble())
+        var a21 = delta_a21 / delta
+        var a31 = delta_a31 / delta
+        var a12 = delta_a12 / delta
+        var a22 = delta_a22 / delta
+        var a32 = delta_a32 / delta
+        var detM = a11 * a22 - a12 * a21
         //вычисление коэффициентов по числам в матрице, формулы с хабра
         val alpha: Double
-        val sy: Double
-        val sx: Double
-        val hx: Double
+        var sy: Double
+        var sx: Double
+        var hx: Double
 
-        if (a22 == 0) {
+        if (a22 == 0.0) {
             alpha = Math.PI / 2
             sy = (-a21).toDouble()
         } else {
@@ -429,37 +409,38 @@ class Filters :AppCompatActivity() {
             sy = a22 / Math.cos(alpha)
         }
         sx = detM / sy
+        if(detM==0.0) detM=1.0
         hx = ((a11 * a21 + a12 * a22) / detM).toDouble()
         //инициализация переменных перед преобазованием
         val w = tmpImage!!.width
         val h = tmpImage!!.height
-        val pixels = IntArray(w * h)
-        tmpImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
+        val pixel = IntArray(w * h)
+        tmpImage!!.getPixels(pixel, 0, w, 0, 0, w, h)
         //растяжение/сжатие
         var newPixels: IntArray
         if (Math.abs(sx) * Math.abs(sy) > 1) {
-            newPixels = bilinear(sx, sy, w, h, pixels)
+            newPixels = bilinear(sx, sy, w, h, pixel)
         } else {
-            newPixels = trilinear(sx, sy, w, h, pixels)
+            newPixels = trilinear(sx, sy, w, h, pixel)
         }
-        val w2 = Math.abs((w * sx).toInt())
-        val h2 = Math.abs((h * sy).toInt())
+        var w2 = Math.abs((w * sx).toInt())
+        var h2 = Math.abs((h * sy).toInt())
         //сдвиг
         newPixels = move(hx, 0.0, w2, h2, newPixels)
         //поворот
-        val temp = rotate(alpha, w2, h2, newPixels)
-        val w3 = temp.width
-        val h3 = temp.height
-        val tempPixels = IntArray(w3 * h3)
+        var temp = rotate(alpha, w2, h2, newPixels)
+        var w3 = temp.width
+        var h3 = temp.height
+        var tempPixels = IntArray(w3 * h3)
         temp.getPixels(tempPixels, 0, w3, 0, 0, w3, h3)
         //обновление currentBitmap
         tmpImage = Bitmap.createBitmap(tempPixels, w3, h3, Bitmap.Config.ARGB_8888)
     }
 
     fun move(tx: Double, ty: Double, w: Int, h: Int, pixels: IntArray): IntArray {
-        val moveX = tx.toInt()
-        val moveY = ty.toInt()
-        val newPixels = IntArray(w * h)
+        var moveX = tx.toInt()
+        var moveY = ty.toInt()
+        var newPixels = IntArray(w * h)
         for (i in 0 until h) {
             for (j in 0 until w) {
                 if (i - moveY < h && i - moveY >= 0 && j - moveX < w && j - moveX >= 0) {
@@ -484,9 +465,9 @@ class Filters :AppCompatActivity() {
             pixels = horizontalFlip(w, h, pixels)
             sy = -sy
         }
-        val w2 = (w * sx).toInt()
-        val h2 = (h * sy).toInt()
-        val newPixels = IntArray(w2 * h2)
+        var w2 = (w * sx).toInt()
+        var h2 = (h * sy).toInt()
+        var newPixels = IntArray(w2 * h2)
         var x_diff: Double
         var y_diff: Double
         var A: Int
