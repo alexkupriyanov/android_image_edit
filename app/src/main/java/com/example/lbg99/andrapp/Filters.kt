@@ -13,6 +13,23 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.widget.TextView
+
+import android.graphics.RectF
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+
+import android.R.attr.radius
+
+
+
+import android.graphics.Color
+import android.graphics.Paint
+import java.nio.file.Files.move
+import android.R.attr.radius
+
+
+
+
 //import sun.swing.SwingUtilities2.drawRect
 
 
@@ -34,11 +51,12 @@ class Filters :AppCompatActivity() {
     var curPath: String? = null
     private var tmpImage: Bitmap? = null
     private var pixels: Array<IntArray>? = null
-
+    private val bitmapCanvas: Canvas? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filters)
+
         curPath = intent.getStringExtra(absolutePath)
         tmpImage = BitmapFactory.decodeFile(curPath)
         Image.setImageBitmap(tmpImage)
@@ -324,7 +342,10 @@ class Filters :AppCompatActivity() {
     }
     var numberOfPoints: Int = 0
     @SuppressLint("ClickableViewAccessibility")
-
+    var corx = 0f
+    var cory = 0f
+    private lateinit var background: Canvass
+    @SuppressLint("ClickableViewAccessibility")
     fun workWithTriangles() {
         // инициализация
         val imageview = findViewById<View>(R.id.Image) as ImageView
@@ -336,27 +357,29 @@ class Filters :AppCompatActivity() {
             var pointsX = DoubleArray(6)
             var pointsY = DoubleArray(6)
             internal var ids = IntArray(6)
+            @SuppressLint("WrongViewCast")
             override fun onTouch(v: View, event: MotionEvent): Boolean { //при касании
                 if (event.action == MotionEvent.ACTION_UP) { //в момент прекращения касания
                     if (numberOfPoints < 6) { //если меньше шести точек
                         //сохранение координат:
                         val x = event.x.toInt()
                         val y = event.y.toInt()
+                        corx= x.toFloat()
+                        cory= y.toFloat()
                         pointsX[numberOfPoints] = x.toDouble()
                         pointsY[numberOfPoints] = y.toDouble()
                         //добавление циферки на экран:
                         points[numberOfPoints] = TextView(getApplicationContext())
                         var  txt = numberOfPoints + 1
-
-
-                        points[numberOfPoints]!!.setText("" + txt)
+                        point.x=x
+                        point.y=y
+                        val layout1 = findViewById(R.id.layout1) as android.support.constraint.ConstraintLayout
+                        val canvass = Canvass(getApplicationContext())
+                        layout1.addView(canvass)
+                        /*points[numberOfPoints]!!.setText("" + txt)
                         val id = View.generateViewId()
                         points[numberOfPoints]!!.setId(id)
-                        ids[numberOfPoints] = id
-                        val layoutParams = RelativeLayout.LayoutParams(
-                                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                                RelativeLayout.LayoutParams.WRAP_CONTENT)
-                        layoutParams.setMargins(x, y, 0, 0)
+                        ids[numberOfPoints] = id*/
 
                         numberOfPoints++
                     }
@@ -379,6 +402,14 @@ class Filters :AppCompatActivity() {
                 return true
             }
         })
+    }
+
+    inner class Canvass(context: Context) : View(context) {
+
+        override fun onDraw(canvas: Canvas) {
+            val paint = Paint()
+            canvas.drawCircle(corx, cory, 5f, paint)
+        }
     }
 
     fun triangl(pointsX: DoubleArray, pointsY: DoubleArray) {
