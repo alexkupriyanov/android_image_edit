@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toStartOf="@+id/sepiabutton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Image"
-        app:layout_constraintVertical_bias="0.507"
+        app:layout_constraintVertical_bias="0.984"
         tools:ignore="MissingConstraints" />
 
     <Button
@@ -45,7 +45,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/grayscalebutton"
         app:layout_constraintStart_toEndOf="@+id/sepiabutton"
-        app:layout_constraintTop_toBottomOf="@+id/Image" />
+        app:layout_constraintTop_toBottomOf="@+id/Image"
+        app:layout_constraintVertical_bias="0.984" />
 
     <Button
         android:id="@+id/sepiabutton"
@@ -57,7 +58,7 @@
         app:layout_constraintEnd_toStartOf="@+id/inversBtn"
         app:layout_constraintStart_toEndOf="@+id/binBtn"
         app:layout_constraintTop_toBottomOf="@+id/Image"
-        app:layout_constraintVertical_bias="0.52" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/grayscalebutton"
@@ -70,6 +71,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/inversBtn"
         app:layout_constraintTop_toBottomOf="@+id/Image"
+        app:layout_constraintVertical_bias="1.0"
         tools:ignore="MissingConstraints" />
 
     <Button
@@ -86,7 +88,7 @@
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Image"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.4" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -100,6 +102,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Image" />
 
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="227dp"
+        android:layout_height="31dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        app:layout_anchor="@+id/Image"
+        app:layout_anchorGravity="bottom|center"
+        app:layout_constraintBottom_toTopOf="@+id/gaussbutton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.439"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Image"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/trigl"
+        android:layout_width="70dp"
+        android:layout_height="41dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Button"
+        app:layout_constraintBottom_toTopOf="@+id/grayscalebutton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintStart_toEndOf="@+id/gaussbutton"
+        app:layout_constraintTop_toBottomOf="@+id/text"
+        app:layout_constraintVertical_bias="1.0" />
 
 
 </android.support.constraint.ConstraintLayout>

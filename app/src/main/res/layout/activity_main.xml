@@ -62,7 +62,21 @@
         android:text="Filters"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/galeryBtn"
-        app:layout_constraintHorizontal_bias="0.489"
+        app:layout_constraintHorizontal_bias="0.884"
         app:layout_constraintStart_toEndOf="@+id/cameraBtn" />
+
+    <Button
+        android:id="@+id/trigl"
+        android:layout_width="52dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Button"
+        app:layout_constraintEnd_toStartOf="@+id/filtBtn"
+        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/saveBtn" />
+
 
 </android.support.constraint.ConstraintLayout>

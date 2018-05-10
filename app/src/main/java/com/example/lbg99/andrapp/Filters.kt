@@ -9,8 +9,6 @@ import android.graphics.Matrix
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.ImageView
-import android.widget.Toast
 import com.example.lbg99.andrapp.R.id.*
 import android.support.v7.app.AlertDialog
 //import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
@@ -22,11 +20,20 @@ import kotlin.text.Typography.half
 import android.opengl.ETC1.getHeight
 import android.opengl.ETC1.getWidth
 import java.util.Collections.rotate
-import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.content.DialogInterface
-
-
+import android.view.MotionEvent
+import android.view.View
+import android.widget.*
+import android.R.attr.y
+import android.R.attr.x
+import android.annotation.SuppressLint
+import java.util.Collections.rotate
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import android.os.Build
+import android.support.annotation.RequiresApi
+import java.nio.file.Files.move
 
 
 class Filters :AppCompatActivity() {
@@ -206,6 +213,9 @@ class Filters :AppCompatActivity() {
 
 
 })
+        trigl.setOnClickListener{
+            workWithTriangles()
+        }
     }
 
     fun getPixelsMatrix()
@@ -329,5 +339,375 @@ class Filters :AppCompatActivity() {
         temp = Bitmap.createBitmap(temp, 0, 0, w, h, matrix, true)
         return temp
     }
+    var numberOfPoints: Int = 0
+    @SuppressLint("ClickableViewAccessibility")
+    internal var pointsX = IntArray(6)
+    internal var pointsY = IntArray(6)
+    @SuppressLint("ClickableViewAccessibility")
+    fun workWithTriangles() {
+        // инициализация
+        val imageview = findViewById<View>(R.id.Image) as ImageView
+        numberOfPoints = 0
+        val textview = findViewById<View>(R.id.text) as TextView
+        textview.text = "Назначьте три точки исходного треугольника [1-2-3]"
+        imageview.setOnTouchListener(object : View.OnTouchListener {
+            internal var points = arrayOfNulls<TextView>(6)
 
+            internal var ids = IntArray(6)
+            override fun onTouch(v: View, event: MotionEvent): Boolean { //при касании
+                if (event.action == MotionEvent.ACTION_UP) { //в момент прекращения касания
+                    if (numberOfPoints < 6) { //если меньше шести точек
+                        //сохранение координат:
+                        val x = event.x.toInt()
+                        val y = event.y.toInt()
+                        pointsX[numberOfPoints] = x
+                        pointsY[numberOfPoints] = y
+                        //добавление циферки на экран:
+                        points[numberOfPoints] = TextView(getApplicationContext())
+                        var  txt = numberOfPoints + 1
+                        points[numberOfPoints]!!.setText("" + txt)
+                        val id = View.generateViewId()
+                        points[numberOfPoints]!!.setId(id)
+                        ids[numberOfPoints] = id
+                        val layoutParams = RelativeLayout.LayoutParams(
+                                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                RelativeLayout.LayoutParams.WRAP_CONTENT)
+                        layoutParams.setMargins(x, y, 0, 0)
+
+                        numberOfPoints++
+                    }
+                    //обновление текста после ввода трёх точек
+                    if (numberOfPoints == 3) {
+                        textview.text = "Назначьте три точки конечного треугольника [4-5-6]"
+                    }
+                    //вычисление коэффициентов после ввода шести точек
+                    if (numberOfPoints == 6) {
+                        textview.text = "" //удаление текстовой подсказки
+
+                            triangl(pointsX, pointsY)
+
+
+                        imageview.setImageBitmap(tmpImage)
+                        numberOfPoints++
+
+                    }
+                }
+                return true
+            }
+        })
+    }
+
+    fun triangl(pointsX:IntArray, pointsY:IntArray) {
+        //вычисление элементов матрицы (мне тоже страшно от этого кода)
+        val delta = pointsX[0] * pointsY[1] + pointsX[1] * pointsY[2] + pointsX[2] * pointsY[0] - pointsX[2] * pointsY[1] - pointsX[1] * pointsY[0] - pointsX[0] * pointsY[2]
+        val delta_a11 = pointsX[3] * pointsY[1] + pointsX[4] * pointsY[2] + pointsX[5] * pointsY[0] - pointsX[5] * pointsY[1] - pointsX[4] * pointsY[0] - pointsX[3] * pointsY[2]
+        val delta_a21 = pointsX[0] * pointsX[4] + pointsX[1] * pointsX[5] + pointsX[2] * pointsX[3] - pointsX[2] * pointsX[4] - pointsX[1] * pointsX[3] - pointsX[0] * pointsX[5]
+        val delta_a31 = pointsX[0] * pointsY[1] * pointsX[5] + pointsX[1] * pointsY[2] * pointsX[3] + pointsX[2] * pointsY[0] * pointsX[4] -
+                pointsX[2] * pointsY[1] * pointsX[3] - pointsX[1] * pointsY[0] * pointsX[5] - pointsX[0] * pointsY[2] * pointsX[4]
+        val delta_a12 = pointsY[3] * pointsY[1] + pointsY[4] * pointsY[2] + pointsY[5] * pointsY[0] - pointsY[5] * pointsY[1] - pointsY[4] * pointsY[0] - pointsY[3] * pointsY[2]
+        val delta_a22 = pointsX[0] * pointsY[4] + pointsX[1] * pointsY[5] + pointsX[2] * pointsY[3] - pointsX[2] * pointsY[4] - pointsX[1] * pointsY[3] - pointsX[0] * pointsY[5]
+        val delta_a32 = pointsX[0] * pointsY[1] * pointsY[5] + pointsX[1] * pointsY[2] * pointsY[3] + pointsX[2] * pointsY[0] * pointsY[4] -
+                pointsX[2] * pointsY[1] * pointsY[3] - pointsX[1] * pointsY[0] * pointsY[5] - pointsX[0] * pointsY[2] * pointsY[4]
+        val a11 = delta_a11 / delta
+        val a21 = delta_a21 / delta
+        val a31 = delta_a31 / delta
+        val a12 = delta_a12 / delta
+        val a22 = delta_a22 / delta
+        val a32 = delta_a32 / delta
+        val detM = a11 * a22 - a12 * a21
+        //вычисление коэффициентов по числам в матрице, формулы с хабра
+        val alpha: Double
+        val sy: Double
+        val sx: Double
+        val hx: Double
+
+        if (a22 == 0) {
+            alpha = Math.PI / 2
+            sy = (-a21).toDouble()
+        } else {
+            alpha = Math.atan((-a21 / a22).toDouble())
+            sy = a22 / Math.cos(alpha)
+        }
+        sx = detM / sy
+        hx = ((a11 * a21 + a12 * a22) / detM).toDouble()
+        //инициализация переменных перед преобазованием
+        val w = tmpImage!!.width
+        val h = tmpImage!!.height
+        val pixels = IntArray(w * h)
+        tmpImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
+        //растяжение/сжатие
+        var newPixels: IntArray
+        if (Math.abs(sx) * Math.abs(sy) > 1) {
+            newPixels = bilinear(sx, sy, w, h, pixels)
+        } else {
+            newPixels = trilinear(sx, sy, w, h, pixels)
+        }
+        val w2 = Math.abs((w * sx).toInt())
+        val h2 = Math.abs((h * sy).toInt())
+        //сдвиг
+        newPixels = move(hx, 0.0, w2, h2, newPixels)
+        //поворот
+        val temp = rotate(alpha, w2, h2, newPixels)
+        val w3 = temp.width
+        val h3 = temp.height
+        val tempPixels = IntArray(w3 * h3)
+        temp.getPixels(tempPixels, 0, w3, 0, 0, w3, h3)
+        //обновление currentBitmap
+        tmpImage = Bitmap.createBitmap(tempPixels, w3, h3, Bitmap.Config.ARGB_8888)
+    }
+
+    fun move(tx: Double, ty: Double, w: Int, h: Int, pixels: IntArray): IntArray {
+        val moveX = tx.toInt()
+        val moveY = ty.toInt()
+        val newPixels = IntArray(w * h)
+        for (i in 0 until h) {
+            for (j in 0 until w) {
+                if (i - moveY < h && i - moveY >= 0 && j - moveX < w && j - moveX >= 0) {
+                    newPixels[i * w + j] = pixels[(i - moveY) * w + (j - moveX)]
+                } else {
+                    newPixels[i * w + j] = 0x00ffffff
+                }
+            }
+        }
+        return newPixels
+    }
+
+    fun bilinear(sx: Double, sy: Double, w: Int, h: Int, pixels: IntArray): IntArray {
+        var sx = sx
+        var sy = sy
+        var pixels = pixels
+        if (sx < 0) {
+            pixels = verticalFlip(w, h, pixels)
+            sx = -sx
+        }
+        if (sy < 0) {
+            pixels = horizontalFlip(w, h, pixels)
+            sy = -sy
+        }
+        val w2 = (w * sx).toInt()
+        val h2 = (h * sy).toInt()
+        val newPixels = IntArray(w2 * h2)
+        var x_diff: Double
+        var y_diff: Double
+        var A: Int
+        var B: Int
+        var C: Int
+        var D: Int
+        var x: Int
+        var y: Int
+        var Agreen: Int
+        var Ablue: Int
+        var Ared: Int
+        var Bgreen: Int
+        var Bblue: Int
+        var Bred: Int
+        var Cgreen: Int
+        var Cblue: Int
+        var Cred: Int
+        var Dgreen: Int
+        var Dblue: Int
+        var Dred: Int
+        var newGreen: Int
+        var newBlue: Int
+        var newRed: Int
+        val newAlpha: Int
+        sx = 1 / sx
+        sy = 1 / sy
+        for (i in 0 until h2) {
+            for (j in 0 until w2) {
+                y = (sy * i).toInt()
+                x = (sx * j).toInt()
+                x_diff = sx * j - x
+                y_diff = sy * i - y
+                A = pixels[y * w + x]
+                B = pixels[y * w + (x + 1) % w]
+                C = pixels[(y + 1) % h * w + x]
+                D = pixels[(y + 1) % h * w + (x + 1) % w]
+                Ared = (A and 0x00ff0000) / 65536
+                Agreen = (A and 0x0000ff00) / 256
+                Ablue = A and 0x000000ff
+                Bred = (B and 0x00ff0000) / 65536
+                Bgreen = (B and 0x0000ff00) / 256
+                Bblue = B and 0x000000ff
+                Cred = (C and 0x00ff0000) / 65536
+                Cgreen = (C and 0x0000ff00) / 256
+                Cblue = C and 0x000000ff
+                Dred = (D and 0x00ff0000) / 65536
+                Dgreen = (D and 0x0000ff00) / 256
+                Dblue = D and 0x000000ff
+                newRed = (Ared.toDouble() * (1 - x_diff) * (1 - y_diff) + Bred.toDouble() * x_diff * (1 - y_diff) + Cred.toDouble() * (1 - x_diff) * y_diff + Dred.toDouble() * x_diff * y_diff).toInt()
+                newGreen = (Agreen.toDouble() * (1 - x_diff) * (1 - y_diff) + Bgreen.toDouble() * x_diff * (1 - y_diff) + Cgreen.toDouble() * (1 - x_diff) * y_diff + Dgreen.toDouble() * x_diff * y_diff).toInt()
+                newBlue = (Ablue.toDouble() * (1 - x_diff) * (1 - y_diff) + Bblue.toDouble() * x_diff * (1 - y_diff) + Cblue.toDouble() * (1 - x_diff) * y_diff + Dblue.toDouble() * x_diff * y_diff).toInt()
+                newPixels[i * w2 + j] = 255 * 16777216 + newRed * 65536 + newGreen * 256 + newBlue
+            }
+        }
+        return newPixels
+    }
+
+    fun trilinear(sx: Double, sy: Double, w: Int, h: Int, pixels: IntArray): IntArray {
+        var sx = sx
+        var sy = sy
+        var pixels = pixels
+        if (sx < 0) {
+            pixels = verticalFlip(w, h, pixels)
+            sx = -sx
+        }
+        if (sy < 0) {
+            pixels = horizontalFlip(w, h, pixels)
+            sy = -sy
+        }
+        val pixels2 = bilinear(0.5, 0.5, w, h, pixels)
+        val w2 = (w * 0.5).toInt()
+        val h2 = (h * 0.5).toInt()
+        val width = (w * sx).toInt()
+        val height = (h * sy).toInt()
+        val newPixels = IntArray(width * height)
+        val w_ratio = ((w - 1).toFloat() / width).toDouble()
+        val h_ratio = ((h - 1).toFloat() / height).toDouble()
+        val w2_ratio = ((w2 - 1).toFloat() / width).toDouble()
+        val h2_ratio = ((h2 - 1).toFloat() / height).toDouble()
+        val h3_diff = ((w - width) / (w - w2).toFloat()).toDouble()
+        var x: Double
+        var y: Double
+        var w_diff: Double
+        var h_diff: Double
+        var x2: Double
+        var y2: Double
+        var w2_diff: Double
+        var h2_diff: Double
+        var A: Int
+        var B: Int
+        var C: Int
+        var D: Int
+        var E: Int
+        var F: Int
+        var G: Int
+        var H: Int
+        var index: Int
+        var index2: Int
+        var indexNew: Int
+        var Ared: Int
+        var Agreen: Int
+        var Ablue: Int
+        var Bred: Int
+        var Bgreen: Int
+        var Bblue: Int
+        var Cred: Int
+        var Cgreen: Int
+        var Cblue: Int
+        var Dred: Int
+        var Dgreen: Int
+        var Dblue: Int
+        var Ered: Int
+        var Egreen: Int
+        var Eblue: Int
+        var Fred: Int
+        var Fgreen: Int
+        var Fblue: Int
+        var Gred: Int
+        var Ggreen: Int
+        var Gblue: Int
+        var Hred: Int
+        var Hgreen: Int
+        var Hblue: Int
+        val newAlpha: Int
+        var newRed: Int
+        var newGreen: Int
+        var newBlue: Int
+        for (i in 0 until height) {
+            for (j in 0 until width) {
+                indexNew = i * width + j
+                x = w_ratio * j
+                y = h_ratio * i
+                w_diff = x - x.toInt()
+                h_diff = y - y.toInt()
+                index = y.toInt() * w + x.toInt()
+                A = pixels[index]
+                B = pixels[(index + 1) % (w * h)]
+                C = pixels[(index + w) % (w * h)]
+                D = pixels[(index + w + 1) % (w * h)]
+                x2 = w2_ratio * j
+                y2 = h2_ratio * i
+                w2_diff = x2 - x2.toInt()
+                h2_diff = y2 - y2.toInt()
+                index2 = y2.toInt() * w2 + x2.toInt()
+                E = pixels2[index2]
+                F = pixels2[(index2 + 1) % (w2 * h2)]
+                G = pixels2[(index2 + w) % (w2 * h2)]
+                H = pixels2[(index2 + w + 1) % (w2 * h2)]
+                Ared = (A and 0x00ff0000) / 65536
+                Agreen = (A and 0x0000ff00) / 256
+                Ablue = A and 0x000000ff
+                Bred = (B and 0x00ff0000) / 65536
+                Bgreen = (B and 0x0000ff00) / 256
+                Bblue = B and 0x000000ff
+                Cred = (C and 0x00ff0000) / 65536
+                Cgreen = (C and 0x0000ff00) / 256
+                Cblue = C and 0x000000ff
+                Dred = (D and 0x00ff0000) / 65536
+                Dgreen = (D and 0x0000ff00) / 256
+                Dblue = D and 0x000000ff
+                Ered = (E and 0x00ff0000) / 65536
+                Egreen = (E and 0x0000ff00) / 256
+                Eblue = E and 0x000000ff
+                Fred = (F and 0x00ff0000) / 65536
+                Fgreen = (F and 0x0000ff00) / 256
+                Fblue = F and 0x000000ff
+                Gred = (G and 0x00ff0000) / 65536
+                Ggreen = (G and 0x0000ff00) / 256
+                Gblue = G and 0x000000ff
+                Hred = (H and 0x00ff0000) / 65536
+                Hgreen = (H and 0x0000ff00) / 256
+                Hblue = H and 0x000000ff
+                newRed = (Ared.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) +
+                        Bred.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
+                        Cred.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) +
+                        Dred.toDouble() * w_diff * h_diff * (1 - h3_diff) +
+                        Ered.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff +
+                        Fred.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
+                        Gred.toDouble() * (1 - w2_diff) * h2_diff * h3_diff +
+                        Hred.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
+                newGreen = (Agreen.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) +
+                        Bgreen.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
+                        Cgreen.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) +
+                        Dgreen.toDouble() * w_diff * h_diff * (1 - h3_diff) +
+                        Egreen.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff +
+                        Fgreen.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
+                        Ggreen.toDouble() * (1 - w2_diff) * h2_diff * h3_diff +
+                        Hgreen.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
+                newBlue = (Ablue.toDouble() * (1 - w_diff) * (1 - h_diff) * (1 - h3_diff) +
+                        Bblue.toDouble() * w_diff * (1 - h_diff) * (1 - h3_diff) +
+                        Cblue.toDouble() * (1 - w_diff) * h_diff * (1 - h3_diff) +
+                        Dblue.toDouble() * w_diff * h_diff * (1 - h3_diff) +
+                        Eblue.toDouble() * (1 - w2_diff) * (1 - h2_diff) * h3_diff +
+                        Fblue.toDouble() * w2_diff * (1 - h2_diff) * h3_diff +
+                        Gblue.toDouble() * (1 - w2_diff) * h2_diff * h3_diff +
+                        Hblue.toDouble() * w2_diff * h2_diff * h3_diff).toInt()
+                newPixels[indexNew] = 255 * 16777216 + newRed * 65536 + newGreen * 256 + newBlue
+            }
+        }
+        return newPixels
+    }
+
+    /** переворачивает currentBitmap по вертикали  */
+    fun verticalFlip(w: Int, h: Int, pixels: IntArray): IntArray {
+        val newPixels = IntArray(w * h)
+        for (i in 0 until h) {
+            for (j in 0 until w) {
+                newPixels[i * w + j] = pixels[i * w + (w - 1 - j)]
+            }
+        }
+        return newPixels
+    }
+
+    /** переворачивает currentBitmap по горизонтали  */
+    fun horizontalFlip(w: Int, h: Int, pixels: IntArray): IntArray {
+        val newPixels = IntArray(w * h)
+        for (i in 0 until h) {
+            for (j in 0 until w) {
+                newPixels[i * w + j] = pixels[(h - 1 - i) * w + j]
+            }
+        }
+        return newPixels
+    }
 }

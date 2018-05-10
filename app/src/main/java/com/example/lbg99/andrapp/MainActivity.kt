@@ -78,6 +78,8 @@ class MainActivity : AppCompatActivity() {
             saveImage()
             randomMe()
         }
+
+
         imageBitmap = (photoImageView.drawable as BitmapDrawable).bitmap
         saveBtn.setOnClickListener {
            saveImage()
