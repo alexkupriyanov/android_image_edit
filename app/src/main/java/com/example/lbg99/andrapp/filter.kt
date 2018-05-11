@@ -228,6 +228,26 @@ class filter : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
+            R.id.sepia -> {
+                tmpImage = sepia(pixels)
+                imageFilter.setImageBitmap(tmpImage)
+                return true
+            }
+            R.id.inverse -> {
+                tmpImage = inverse(pixels)
+                imageFilter.setImageBitmap(tmpImage)
+                return true
+            }
+            R.id.bin -> {
+                tmpImage = bin(pixels)
+                imageFilter.setImageBitmap(tmpImage)
+                return true
+            }
+            R.id.gray -> {
+                tmpImage = gray(pixels)
+                imageFilter.setImageBitmap(tmpImage)
+                return true
+            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

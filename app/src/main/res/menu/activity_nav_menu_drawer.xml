@@ -8,6 +8,9 @@
             android:id="@+id/smth"
             android:icon="@drawable/ic_menu_camera"
             android:title="Filters" />
+        <item
+            android:id="@+id/frag"
+            android:title="Frag"/>
     </group>
 
     <item android:title="Other">
@@ -16,6 +19,7 @@
                 android:id="@+id/filter"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Filters" />
+
         </menu>
     </item>
 

@@ -12,14 +12,17 @@ import kotlinx.android.synthetic.main.app_bar_nav_menu.*
 import android.content.DialogInterface
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.FragmentManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
+import android.widget.ImageView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.nav_header_filter.*
 import java.io.File
@@ -45,7 +48,7 @@ class commonData {
             e.printStackTrace()
         }
     }
-    fun init(newBitmap: Bitmap) {
+    fun init(newBitmap: Bitmap?) {
         imageBitmap = newBitmap
         val root = Environment.getExternalStorageDirectory().toString()
         val myDir = File(root + "/capture_photo")
@@ -63,6 +66,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
     val REQUEST_TAKE_PHOTO = 2
     var mCurrentPhotoPath: String? = null
     var imageBitmap: Bitmap?=null
+    val manager = supportFragmentManager
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
@@ -103,7 +107,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                     })
             builder.show()
         }
-        commonData().init( as Bitmap)
+
         saveBtn.setOnClickListener {
             commonData().saveChange()
             Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
@@ -113,6 +117,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
+        commonData().init(BitmapFactory.decodeResource(resources,R.mipmap.logo))
     }
 
     private fun photoFromGallery() {
@@ -188,6 +193,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.filter -> {
                 startActivity(Intent(this, filter::class.java))
             }
+            R.id.frag -> {
+                addFragmentToActivity(FilterFragment(), R.layout.fragment_filter)
+            }
 
         }
 
@@ -195,4 +203,11 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         return true
     }
 
+    fun addFragmentToActivity(fragment: Fragment, frameId: Int) {
+        val transaction = manager.beginTransaction()
+        transaction.replace(frameId, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+    }
 }
