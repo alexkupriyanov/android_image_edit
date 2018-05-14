@@ -61,104 +61,30 @@ class commonData {
     }
 }
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    val REQUEST_IMAGE_CAPTURE = 1
-    val REQUEST_TAKE_PHOTO = 2
-    var mCurrentPhotoPath: String? = null
-    var imageBitmap: Bitmap?=null
     val manager = supportFragmentManager
 
     @Throws(IOException::class)
-    private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File.createTempFile(
-                imageFileName, /* prefix */
-                ".jpg", /* suffix */
-                storageDir      /* directory */
-        )
 
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.absolutePath
-        return image
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_menu)
         setSupportActionBar(toolbar)
-        fab.setOnClickListener {
-            val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle(R.string.take_quest)
-                    .setItems(content, DialogInterface.OnClickListener { dialog, which ->
-                        // The 'which' argument contains the index position
-                        // of the selected item
-                        if (which == 0) {
-                           takeAndSetPhoto()
-                        }
-                        if (which == 1) {
-                            photoFromGallery()
-                        }
-                        commonData().saveChange()
-                    })
-            builder.show()
-        }
 
-        saveBtn.setOnClickListener {
-            commonData().saveChange()
-            Toast.makeText(this, "Save complete!", Toast.LENGTH_SHORT).show()
-        }
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
         commonData().init(BitmapFactory.decodeResource(resources,R.mipmap.logo))
+        addFragmentToActivity(MainFragment(),R.layout.fragment_main)
     }
 
-    private fun photoFromGallery() {
-        val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
-        callGalleryIntent.type = "image/*"
-        if (callGalleryIntent.resolveActivity(packageManager) != null) {
-            startActivityForResult(callGalleryIntent, REQUEST_IMAGE_CAPTURE)
-        }
-    }
 
-    private fun takeAndSetPhoto(){
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            var photoFile: File? = null
-            try {
-                photoFile = createImageFile()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            if (photoFile != null) {
-                val auth: String = packageName + ".fileprovider"
-                val photoURI = FileProvider.getUriForFile(this,
-                        auth,
-                        photoFile)
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
-            }
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val selectedImage = data?.data
-            imageBitmap = MediaStore.Images.Media.getBitmap(contentResolver,selectedImage)
-            photoImageView.setImageBitmap(imageBitmap)
 
-        }
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
-            photoImageView.setImageBitmap(imageBitmap)
-        }
     }
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
