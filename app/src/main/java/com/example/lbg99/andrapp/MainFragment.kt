@@ -50,28 +50,7 @@ class MainFragment : Fragment() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fab.setOnClickListener {
-            val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle(R.string.take_quest)
-                    .setItems(content, DialogInterface.OnClickListener { dialog, which ->
-                        // The 'which' argument contains the index position
-                        // of the selected item
-                        if (which == 0) {
-                            takeAndSetPhoto()
-                        }
-                        if (which == 1) {
-                            photoFromGallery()
-                        }
-                        commonData().saveChange()
-                    })
-            builder.show()
-        }
 
-        saveBtn.setOnClickListener {
-            commonData().saveChange()
-            Toast.makeText(context, "Save complete!", Toast.LENGTH_SHORT).show()
-        }
     }
     private fun photoFromGallery() {
         val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -101,7 +80,7 @@ class MainFragment : Fragment() {
         }
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater!!.inflate(R.layout.fragment_filter, container, false)
+        return inflater!!.inflate(R.layout.fragment_main, container, false)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -123,6 +102,29 @@ class MainFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        photoImageView.setImageBitmap(commonData.imageBitmap)
+        fab.setOnClickListener {
+            val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle(R.string.take_quest)
+                    .setItems(content, DialogInterface.OnClickListener { dialog, which ->
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        if (which == 0) {
+                            takeAndSetPhoto()
+                        }
+                        if (which == 1) {
+                            photoFromGallery()
+                        }
+                        commonData().saveChange()
+                    })
+            builder.show()
+        }
+
+        saveBtn.setOnClickListener {
+            commonData().saveChange()
+            Toast.makeText(context, "Save complete!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onResume() {

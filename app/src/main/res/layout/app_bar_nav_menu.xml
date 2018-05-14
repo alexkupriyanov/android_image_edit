@@ -24,5 +24,13 @@
         android:id="@+id/include"
         layout="@layout/content_nav_menu"
         app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="top|center" />
+        app:layout_anchorGravity="top|center"
+        />
+
+    <FrameLayout
+        android:id="@+id/fragment_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

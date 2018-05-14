@@ -33,8 +33,9 @@ import java.util.*
 
 class commonData {
     companion object {
-        var imageBitmap: Bitmap?=null
-        var currentPhotoPath: String?=null
+        var imageBitmap: Bitmap? = null
+        var currentPhotoPath: String? = null
+        var pixels: Array<IntArray>? = null
     }
     fun saveChange() {
         val file = File(currentPhotoPath)
@@ -50,6 +51,7 @@ class commonData {
     }
     fun init(newBitmap: Bitmap?) {
         imageBitmap = newBitmap
+        pixels = getPixelsMatrix(imageBitmap)
         val root = Environment.getExternalStorageDirectory().toString()
         val myDir = File(root + "/capture_photo")
         myDir.mkdirs()
@@ -59,6 +61,15 @@ class commonData {
         currentPhotoPath = file.absolutePath
         saveChange()
     }
+}
+
+fun getPixelsMatrix(tmpImage: Bitmap?): Array<IntArray>? { //получает матрицу пикселей из bitmap (просто интовые байты)
+    var arr = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
+    for(i in 0 until tmpImage!!.width)
+        for(j in 0 until tmpImage!!.height) {
+            arr[i][j]= tmpImage!!.getPixel(i,j)
+        }
+    return arr // закинули в глобальный массив
 }
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     val manager = supportFragmentManager
@@ -78,7 +89,7 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
         commonData().init(BitmapFactory.decodeResource(resources,R.mipmap.logo))
-        addFragmentToActivity(MainFragment(),R.layout.fragment_main)
+        addFragmentToActivity(MainFragment())
     }
 
 
@@ -116,11 +127,10 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.filter -> {
-                startActivity(Intent(this, filter::class.java))
+            R.id.filters -> {
+                addFragmentToActivity(FilterFragment())
             }
             R.id.frag -> {
-                addFragmentToActivity(FilterFragment(), R.layout.fragment_filter)
             }
 
         }
@@ -129,9 +139,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         return true
     }
 
-    fun addFragmentToActivity(fragment: Fragment, frameId: Int) {
+    fun addFragmentToActivity(fragment: Fragment) {
         val transaction = manager.beginTransaction()
-        transaction.replace(frameId, fragment)
+        transaction.replace(R.id.fragment_holder, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
 
