@@ -27,10 +27,13 @@ import android.graphics.Paint
 import java.nio.file.Files.move
 import android.R.attr.radius
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.R.attr.y
+import android.R.attr.x
+import android.support.constraint.ConstraintLayout
+import android.widget.RelativeLayout
 
-
-
-//import sun.swing.SwingUtilities2.drawRect
 
 
 
@@ -347,6 +350,12 @@ class Filters :AppCompatActivity() {
     private lateinit var background: Canvass
     @SuppressLint("ClickableViewAccessibility")
     fun workWithTriangles() {
+        val relativeLayout = findViewById(R.id.layout1) as android.support.constraint.ConstraintLayout
+        val w = tmpImage!!.width
+        val h = tmpImage!!.height
+        val pixel = IntArray(w * h)
+        tmpImage!!.getPixels(pixel, 0, w, 0, 0, w, h)
+        var temp =Bitmap.createBitmap(pixel, w, h, Bitmap.Config.ARGB_8888)
         val imageview = findViewById<View>(R.id.Image) as ImageView
         numberOfPoints = 0
         val textview = findViewById<View>(R.id.text) as TextView
@@ -366,12 +375,22 @@ class Filters :AppCompatActivity() {
                         cory= y.toFloat()
                         pointsX[numberOfPoints] = x.toDouble()
                         pointsY[numberOfPoints] = y.toDouble()
+                        val mView = TextView(applicationContext)
                         //добавление циферки на экран:
-                        points[numberOfPoints] = TextView(getApplicationContext())
-                        var  txt = numberOfPoints + 1
-                        val layout1 = findViewById(R.id.layout1) as android.support.constraint.ConstraintLayout
-                        val canvass = Canvass(getApplicationContext())
-                        layout1.addView(canvass)
+                        points[numberOfPoints] = mView
+                        //val layout1 = findViewById(R.id.layout1) as android.support.constraint.ConstraintLayout
+                       // val canvass = Canvass(getApplicationContext())
+
+                        val text = numberOfPoints + 1
+                        points[numberOfPoints]!!.setText("" + text)
+                        val id = View.generateViewId()
+                        points[numberOfPoints]!!.setId(id)
+                        ids[numberOfPoints] = id
+                        val layoutParams = ConstraintLayout.LayoutParams(
+                                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                                ConstraintLayout.LayoutParams.MATCH_PARENT)
+                        layoutParams.setMargins(x, y, 0, 0)
+                        relativeLayout.addView(points[numberOfPoints], layoutParams)
 
                         numberOfPoints++
                     }
@@ -383,12 +402,16 @@ class Filters :AppCompatActivity() {
                     if (numberOfPoints == 6) {
                         textview.text = ""
 
-                            triangl(pointsX, pointsY)
+
+                          triangl(pointsX, pointsY)
 
 
                         imageview.setImageBitmap(tmpImage)
                         numberOfPoints++
-
+                        for (i in 0..5) {
+                            val curView = findViewById(ids[i]) as TextView
+                            relativeLayout.removeView(curView)
+                        }
                     }
                 }
                 return true
@@ -403,6 +426,15 @@ class Filters :AppCompatActivity() {
             canvas.drawCircle(corx, cory, 5f, paint)
         }
     }
+
+    inner class Canvasss(context: Context) : View(context) {
+
+        override fun onDraw(canvas: Canvas) {
+            tmpImage!!.eraseColor(Color.TRANSPARENT)
+            //canvas.drawBitmap(tmpImage, 0, 0,tmpImagePaint)
+        }
+    }
+
 
     fun triangl(pointsX: DoubleArray, pointsY: DoubleArray) {
         //вычисление элементов матрицы (мне тоже страшно от этого кода)
