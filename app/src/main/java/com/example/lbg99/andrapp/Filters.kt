@@ -14,6 +14,14 @@ import android.support.constraint.ConstraintLayout
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import android.widget.Toast
+import android.widget.EditText
+import android.content.DialogInterface
+import android.support.v7.app.AlertDialog
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+
+
 
 
 class Filters :AppCompatActivity() {
@@ -193,9 +201,13 @@ class Filters :AppCompatActivity() {
 
 
         })
-        trigl.setOnClickListener{
+        trigl.setOnClickListener {
             workWithTriangles()
         }
+button2.setOnClickListener {
+    zoom()
+}
+
     }
 
     fun getPixelsMatrix()
@@ -207,6 +219,52 @@ class Filters :AppCompatActivity() {
         pixels = arr // закинули в глобальный массив
     }
 
+    fun zoom() {
+        //создание всплывающего окна
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Масштабирование")
+        val view = this.getLayoutInflater().inflate(R.layout.layout_zoom_selector, null)
+        builder.setView(view)
+        //при нажатии на ОК
+        builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
+            val number = view.findViewById(R.id.zoomValue) as EditText
+            val value = java.lang.Double.parseDouble(number.text.toString())
+            try {
+                Zoom(value)
+            } catch (e: OutOfMemoryError) { //если недостаточно памяти
+                Toast.makeText(applicationContext, "Недостаточно памяти для выполнения операции", Toast.LENGTH_SHORT).show()
+            }
+
+            val imageview = findViewById<View>(R.id.Image) as ImageView
+            imageview.setImageBitmap(tmpImage)
+            dialog.dismiss()
+        })
+        builder.setCancelable(true)
+        val dialog = builder.create()
+        dialog.show()
+
+    }
+
+    fun Zoom(value: Double) {
+        var value = value
+        //инициализация переменных перед преобазованием
+        value /= 100.0
+        val w = tmpImage!!.getWidth()
+        val h = tmpImage!!.getHeight()
+        val pixels = IntArray(w * h)
+        tmpImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
+        //растяжение/сжатие
+        val newPixels: IntArray
+        if (Math.abs(value) > 1) {
+            newPixels = bilinear_filt(value, value, w, h, pixels)
+        } else {
+            newPixels = trilinear_filt(value, value, w, h, pixels)
+        }
+        val w2 = Math.abs((w * value).toInt())
+        val h2 = Math.abs((h * value).toInt())
+        //обновление currentBitmap
+       tmpImage = Bitmap.createBitmap(newPixels, w2, h2, Bitmap.Config.ARGB_8888)
+    }
 
     fun  applyGaussianBlur(src: Bitmap, radius: Int,threshold:Double,amount:Double): Bitmap  {
 
