@@ -1,7 +1,12 @@
 package com.example.lbg99.andrapp
 
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Environment
 import android.support.design.widget.NavigationView
+import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
@@ -9,21 +14,6 @@ import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_nav_menu.*
 import kotlinx.android.synthetic.main.app_bar_nav_menu.*
-import android.content.DialogInterface
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.FragmentManager
-import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.os.Environment
-import android.provider.MediaStore
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v4.content.FileProvider
-import android.widget.ImageView
-import android.widget.Toast
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
