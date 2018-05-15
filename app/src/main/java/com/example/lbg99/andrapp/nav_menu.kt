@@ -24,7 +24,6 @@ import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
 import android.widget.ImageView
 import android.widget.Toast
-import kotlinx.android.synthetic.main.nav_header_filter.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -130,9 +129,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.filters -> {
                 addFragmentToActivity(FilterFragment())
             }
-            R.id.frag -> {
+            R.id.unsharp_masking -> {
+                addFragmentToActivity(UnsharpMaskingFragment())
             }
-
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

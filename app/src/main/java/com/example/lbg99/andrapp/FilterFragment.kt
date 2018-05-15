@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.app_bar_filter.*
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 class FilterFragment : Fragment() {
@@ -73,6 +72,7 @@ class FilterFragment : Fragment() {
             commonData.pixels = pixels
         }
     }
+
     fun bin(pxl : Array<IntArray>?) : Bitmap? {
         var matrix = pxl
         for (i in 0 until tmpImage!!.width)
