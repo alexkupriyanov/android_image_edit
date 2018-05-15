@@ -41,7 +41,7 @@ class UnsharpMaskingFragment : Fragment() {
         }
 
         doBtn.setOnClickListener {
-            tmpImage = applyGaussianBlur(commonData.imageBitmap!!, 3, trashValue.text.toString().toDouble(), alphaValue.text.toString().toDouble())
+            tmpImage = applyGaussianBlur(commonData.imageBitmap!!, radiusValue.text.toString().toInt(), trashValue.text.toString().toDouble(), alphaValue.text.toString().toDouble())
             maskingView.setImageBitmap(tmpImage)
         }
 
@@ -59,7 +59,19 @@ class UnsharpMaskingFragment : Fragment() {
         })
         trashSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                trashValue.text = (progress.toDouble()/10).toString()
+                trashValue.text = progress.toInt().toString()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+        })
+        radiusSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                radiusValue.text = progress.toInt().toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {

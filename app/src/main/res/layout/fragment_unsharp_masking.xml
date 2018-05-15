@@ -21,10 +21,8 @@
 
     <SeekBar
         android:id="@+id/alphaSeek"
-        android:layout_width="253dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="261dp"
+        android:layout_height="19dp"
         android:max="50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/alphaValue" />
@@ -35,18 +33,18 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:text="Alpha"
+        android:layout_marginTop="24dp"
+        android:text="Amount"
         app:layout_constraintEnd_toStartOf="@+id/alphaSeek"
-        app:layout_constraintHorizontal_bias="0.507"
+        app:layout_constraintHorizontal_bias="0.742"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/maskingView" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/trashText"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="40dp"
         android:text="Trash hold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trashValue" />
@@ -57,10 +55,10 @@
         android:layout_height="22dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:max="50"
+        android:max="255"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintStart_toEndOf="@+id/trashText"
         app:layout_constraintTop_toBottomOf="@+id/trashValue" />
 
     <TextView
@@ -90,18 +88,22 @@
         android:id="@+id/doBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="do"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trashSeek" />
+        app:layout_constraintTop_toBottomOf="@+id/radiusSeek"
+        app:layout_constraintVertical_bias="0.428" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/cancelBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -111,10 +113,42 @@
         android:id="@+id/applyBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="24dp"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_save" />
+
+    <TextView
+        android:id="@+id/radiusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:text="Radius"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="472dp" />
+
+    <TextView
+        android:id="@+id/radiusValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/radiusText"
+        app:layout_constraintTop_toBottomOf="@+id/trashSeek" />
+
+    <SeekBar
+        android:id="@+id/radiusSeek"
+        android:layout_width="248dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:max="5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.542"
+        app:layout_constraintStart_toEndOf="@+id/radiusText"
+        app:layout_constraintTop_toBottomOf="@+id/radiusValue" />
 </android.support.constraint.ConstraintLayout>

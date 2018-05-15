@@ -94,7 +94,8 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
+        super.onActivityResult(requestCode, resultCode, data)
+        MainFragment().onActivityResult(requestCode,resultCode,data)
     }
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
@@ -131,6 +132,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             }
             R.id.unsharp_masking -> {
                 addFragmentToActivity(UnsharpMaskingFragment())
+            }
+            R.id.turn -> {
+                addFragmentToActivity(TurnFragment())
             }
         }
 

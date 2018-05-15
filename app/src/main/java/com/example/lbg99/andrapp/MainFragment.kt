@@ -39,7 +39,7 @@ class MainFragment : Fragment() {
         // Create an image file name
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val imageFileName = "JPEG_" + timeStamp + "_"
-        val storageDir = nav_menu().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val storageDir = activity?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val image = File.createTempFile(
                 imageFileName, /* prefix */
                 ".jpg", /* suffix */
@@ -57,14 +57,14 @@ class MainFragment : Fragment() {
     private fun photoFromGallery() {
         val callGalleryIntent = Intent(Intent.ACTION_GET_CONTENT)
         callGalleryIntent.type = "image/*"
-        if (callGalleryIntent.resolveActivity(nav_menu().packageManager) != null) {
+        if (callGalleryIntent.resolveActivity(activity?.packageManager) != null) {
             startActivityForResult(callGalleryIntent, REQUEST_IMAGE_CAPTURE)
         }
     }
 
     private fun takeAndSetPhoto(){
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(nav_menu().packageManager) != null) {
+        if (takePictureIntent.resolveActivity(activity?.packageManager) != null) {
             var photoFile: File? = null
             try {
                 photoFile = createImageFile()
@@ -72,7 +72,7 @@ class MainFragment : Fragment() {
                 e.printStackTrace()
             }
             if (photoFile != null) {
-                val auth: String = nav_menu().packageName + ".fileprovider"
+                val auth: String = activity?.packageName + ".fileprovider"
                 val photoURI = FileProvider.getUriForFile(context!!,
                         auth,
                         photoFile)
@@ -86,10 +86,10 @@ class MainFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        super .onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
-            imageBitmap = MediaStore.Images.Media.getBitmap(nav_menu().contentResolver,selectedImage)
+            imageBitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver,selectedImage)
             photoImageView.setImageBitmap(imageBitmap)
 
         }
