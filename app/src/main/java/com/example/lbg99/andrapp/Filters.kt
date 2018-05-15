@@ -9,12 +9,24 @@ import android.graphics.Matrix
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.ImageView
 import android.widget.Toast
+import com.example.lbg99.andrapp.R.id.*
+import android.support.v7.app.AlertDialog
+//import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
 import kotlinx.android.synthetic.main.activity_filters.*
 import kotlinx.android.synthetic.main.activity_filters.view.*
 import java.io.IOException
-import com.example.lbg99.andrapp.Filters.ConvolutionMatrix
-import com.example.lbg99.andrapp.Filters.ConvolutionMatrix.Companion.computeConvolution
+import kotlin.math.*
+import kotlin.text.Typography.half
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import java.util.Collections.rotate
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.content.DialogInterface
+
+
 
 
 class Filters :AppCompatActivity() {
@@ -161,13 +173,43 @@ class Filters :AppCompatActivity() {
             Image.setImageBitmap(tmp)
 
         }
-        gaussbutton.setOnClickListener{
-            applyGaussianBlur(tmpImage!!)
 
-        }
+            gaussbutton.setOnClickListener{
+                Image.setImageBitmap(applyGaussianBlur(tmpImage!!, 3,0.0,2.0))
+
+               }
+        seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                // Write code to perform some action when progress is changed.
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                // Write code to perform some action when touch is started.
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                // Write code to perform some action when touch is stopped.
+                val number = findViewById(R.id.seekBar) as SeekBar
+                val value = (number.progress - 180).toDouble()
+                try {
+                    Rotate(value)
+                } catch (e: OutOfMemoryError) { //если недостаточно памяти
+                    Toast.makeText(applicationContext, "Недостаточно памяти для выполнения операции", Toast.LENGTH_SHORT).show()
+                }
+
+                val imageview = findViewById(R.id.Image) as ImageView
+                imageview.setImageBitmap(tmpImage)
+
+            }
+
+
+
+
+})
     }
 
-    fun getPixelsMatrix() { //получает матрицу пикселей из bitmap (просто интовые байты)
+    fun getPixelsMatrix()
+    { //получает матрицу пикселей из bitmap (просто интовые байты)
         var arr:Array<IntArray>? = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
         for(i in 0 until tmpImage!!.width)
             for(j in 0 until tmpImage!!.height)
@@ -175,107 +217,117 @@ class Filters :AppCompatActivity() {
         pixels = arr // закинули в глобальный массив
     }
 
-    fun applyGaussianBlur(src: Bitmap) {
-        //set gaussian blur configuration
-        val GaussianBlurConfig = arrayOf(doubleArrayOf(1.0, 2.0, 1.0), doubleArrayOf(2.0, 4.0, 2.0), doubleArrayOf(1.0, 2.0, 1.0))
-        // create instance of Convolution matrix
-        val convMatrix = ConvolutionMatrix(3)
-        // Apply Configuration
-        convMatrix.applyConfig(GaussianBlurConfig)
-        convMatrix.Factor = 16.0
-        convMatrix.Offset = 0.0
-        val width = src.getWidth()
-        val height = src.getHeight()
-        //return out put bitmap
-        var t:Bitmap? =computeConvolution(src, convMatrix)
-        Image.setImageBitmap(t)
 
-    }
+    fun  applyGaussianBlur(src: Bitmap, radius: Int,threshold:Double,amount:Double): Bitmap  {
 
-    class ConvolutionMatrix(size: Int) {
-        var Matrix: Array<DoubleArray>
-        var Factor = 1.0
-        var Offset = 1.0
+        val SIZE = 2 * radius + 1
+        var sum = 0.0
+        var pixels = IntArray(src!!.width * src!!.height)
+        val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
+        val width = src.width
+        val height = src.height
+        src.getPixels(pixels, 0, width, 0, 0, width, height)
+        var sumR: Double
+        var sumG:Double  // переменные для вычисления суммы цвета
+        var sumB: Double
 
-        init {
-            Matrix = Array(size, { DoubleArray(size) })
-        }
+        var x1 = 0
+        var y1 = 0
+        val result = Bitmap.createBitmap(width, height, src.config)
 
-        fun applyConfig(config: Array<DoubleArray>) {
-            for (x in 0 until SIZE) {
-                for (y in 0 until SIZE) {
-                    Matrix[x][y] = config[x][y]
-                }
+        for (x in -radius until radius) {
+            for (y in -radius until radius) {
+                weights[x1][y1] = (Math.pow (Math.E, (-((x*x+y*y)/(2*radius*radius))).toDouble())) / (2*PI*radius*radius)
+               // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                sum += weights[x1][y1]
+                y1++
             }
+            y1 = 0
+            x1++
         }
 
-        companion object {
-            val Radius = 5
-            val SIZE = Radius * 2 + 1
+        if (sum == 0.0)  // чтобы избежать деления на 0
+            sum = 1.0
 
-            fun computeConvolution(src: Bitmap, matrix: ConvolutionMatrix): Bitmap {
-                val width = src.getWidth()
-                val height = src.getHeight()
-                val result = Bitmap.createBitmap(width, height, src.getConfig())
-                var A: Int
-                var R: Int
-                var G: Int
-                var B: Int
-                var sumR: Double
-                var sumG: Double
-                var sumB: Double
-                var pixels1 = Array<IntArray>(SIZE, { IntArray(SIZE) })
-                for (y in 0 until height - 2) {
-                    for (x in 0 until width - 2) {
-                        // get pixel matrix
-                        for (i in 0 until SIZE) {
-                            for (j in 0 until SIZE) {
-                                pixels1[i][j] = src.getPixel(x + i, y + j)
-                            }
-                        }
-                        // get alpha of center pixel
-                        A = Color.alpha(pixels1[1][1])
-                        // init color sum
-                        sumB = 0.0
-                        sumG = 0.0
-                        sumR = 0.0
-                        // get sum of RGB on matrix
-                        for (i in 0 until SIZE) {
-                            for (j in 0 until SIZE) {
-                                sumR += (Color.red(pixels1[i][j]) * matrix.Matrix[i][j])
-                                sumG += (Color.green(pixels1[i][j]) * matrix.Matrix[i][j])
-                                sumB += (Color.blue(pixels1[i][j]) * matrix.Matrix[i][j])
-                            }
+        for (y in 0 until height - SIZE + 1) {
+            for (x in 0 until width - SIZE + 1) {
 
-                            // get final Red
-                            R = (sumR / matrix.Factor + matrix.Offset).toInt()
-                            if (R < 0) {
-                                R = 0
-                            } else if (R > 255) {
-                                R = 255
-                            }
-                            // get final Green
-                            G = (sumG / matrix.Factor + matrix.Offset).toInt()
-                            if (G < 0) {
-                                G = 0
-                            } else if (G > 255) {
-                                G = 255
-                            }
-                            // get final Blue
-                            B = (sumB / matrix.Factor + matrix.Offset).toInt()
-                            if (B < 0) {
-                                B = 0
-                            } else if (B > 255) {
-                                B = 255
-                            }
-                            // apply new pixel
-                            result.setPixel(x + 1, y + 1, Color.argb(A, R, G, B))
-                        }
+
+                sumB = 0.0
+                sumG = sumB
+                sumR = sumG
+
+                for (i in 0 until SIZE) {
+                    for (j in 0 until SIZE) {
+                        sumR += ((Color.red(pixels[x+i+width*(y+j)]) * weights[i][j]))
+                        sumG += ((Color.green(pixels[x+i+width*(y+j)]) * weights[i][j]))  // считаем сумму для цветов
+                        sumB += ((Color.blue(pixels[x+i+width*(y+j)]) * weights[i][j]))
                     }
                 }
-                return result
+
+               var R = (sumR/sum).toInt()
+                if (R < 0) {
+                    R = 0
+                } else if (R > 255) {
+                    R = 255
+                }
+                                                // получаем итоговые цвета
+               var G = (sumG/sum).toInt()
+                if (G < 0) {
+                    G = 0
+                } else if (G > 255) {
+                    G = 255
+                }
+
+              var  B = (sumB/sum).toInt()
+                if (B < 0) {
+                    B = 0
+                } else if (B > 255) {
+                    B = 255
+                }
+
+                var diff = (R - Color.red(pixels[(x+1)+(y+1)*width]) + G - Color.green(pixels[(x+1)+(y+1)*width]) + B - Color.blue(pixels[(x+1)+(y+1)*width])) / 3;
+                if (Math.abs(2*diff) > threshold) {
+                    R = Color.red(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
+                    G = Color.green(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
+                    B = Color.blue(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
+                    if (R > 255) R = 255
+                    if (R < 0) R = 0
+                    if (G > 255) G = 255
+                    if (G < 0) G = 0
+                    if (B > 255) B = 255
+                    if (B < 0) B = 0
+                }
+                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B));
             }
-        }
+            }
+
+        //imageview.setImageBitmap(result)
+        return result
+    }
+
+
+    /** Поворачивает изображение  */
+    fun Rotate(value: Double) {
+        var value = value
+        value = Math.toRadians(value)
+        //инициализация переменных перед преобазованием
+        val w = tmpImage!!.width
+        val h = tmpImage!!.height
+        val pixels = IntArray(w * h)
+        tmpImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
+        //поворот currentBitmap
+        tmpImage = rotate(value, w, h, pixels)
+    }
+
+    /** повораичвает изображение на заданный угол  */
+    //сейчас использует встроенные средства; возможно, это надо исправить
+    fun rotate(alpha: Double, w: Int, h: Int, pixels: IntArray): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(Math.toDegrees(alpha).toFloat())
+        var temp = Bitmap.createBitmap(pixels, w, h, Bitmap.Config.ARGB_8888)
+        temp = Bitmap.createBitmap(temp, 0, 0, w, h, matrix, true)
+        return temp
     }
 
 }
