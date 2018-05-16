@@ -32,13 +32,13 @@ class ZoomFragment : Fragment() {
         zoomSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (progress >= zoomSeek.max / 2) {
-                    resizeValue.text = (progress - zoomSeek.max / 2 + 1).toString()
+                    resizeValue.text = ((progress - zoomSeek.max / 2).toDouble() / 10 + 1).toString()
                     zoom = resizeValue.text.toString().toDouble()
                 } else {
                     val pre = "1/"
-                    val post = (zoomSeek.max / 2 + 1 - progress).toString()
+                    val post = ((zoomSeek.max / 2 - progress).toDouble() / 10 + 1).toString()
                     resizeValue.text = "$pre$post"
-                    zoom = 1.0/post.toDouble()
+                    zoom = 1.0 / post.toDouble()
                 }
             }
 
@@ -48,7 +48,7 @@ class ZoomFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 if (zoom != 1.0) {
-                    tmpImage = Zoom(zoom, commonData.imageBitmap)
+                    tmpImage = Zoom(zoom * 100.0, commonData.imageBitmap)
                     zoomView.setImageBitmap(tmpImage)
                 }
                 else
