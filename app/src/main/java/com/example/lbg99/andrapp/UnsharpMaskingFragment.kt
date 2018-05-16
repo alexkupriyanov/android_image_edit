@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_unsharp_masking.*
 import android.widget.SeekBar
-import android.widget.TextView
-import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
 
@@ -31,17 +29,24 @@ class UnsharpMaskingFragment : Fragment() {
         tmpImage = commonData.imageBitmap
         maskingView.setImageBitmap(commonData.imageBitmap)
 
-        cancelBtn.setOnClickListener {
+        cancelMaskBtn.setOnClickListener {
             maskingView.setImageBitmap(commonData.imageBitmap)
             tmpImage = commonData.imageBitmap
+            alphaSeek.progress = 0
+            trashSeek.progress = 0
+            radiusSeek.progress = 0
+            alphaValue.text = "0"
+            trashValue.text = "0"
+            radiusValue.text = "1"
+
         }
 
-        applyBtn.setOnClickListener {
+        applyMaskBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
 
         doBtn.setOnClickListener {
-            tmpImage = applyGaussianBlur(commonData.imageBitmap!!, radiusValue.text.toString().toInt(), trashValue.text.toString().toDouble(), alphaValue.text.toString().toDouble())
+            tmpImage = applyGaussianBlur(commonData.imageBitmap!!, radiusValue.text.toString().toInt() + 1, trashValue.text.toString().toDouble(), alphaValue.text.toString().toDouble())
             maskingView.setImageBitmap(tmpImage)
         }
 
@@ -71,7 +76,7 @@ class UnsharpMaskingFragment : Fragment() {
         })
         radiusSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                radiusValue.text = progress.toInt().toString()
+                radiusValue.text = (progress + 1).toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {

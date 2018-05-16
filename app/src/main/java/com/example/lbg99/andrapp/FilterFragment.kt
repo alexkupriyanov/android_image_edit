@@ -41,7 +41,7 @@ class FilterFragment : Fragment() {
         pixels = commonData.pixels
         oldPixels = pixels
 
-        cancelBtn.setOnClickListener {
+        cancelFilterBtn.setOnClickListener {
             pixels = oldPixels
             tmpImage = commonData.imageBitmap
             photoView.setImageBitmap(tmpImage)
@@ -67,7 +67,7 @@ class FilterFragment : Fragment() {
             photoView.setImageBitmap(tmpImage)
         }
 
-        applyBtn.setOnClickListener {
+        applyFilterBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
             commonData.pixels = pixels
         }

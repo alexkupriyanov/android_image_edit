@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import kotlinx.android.synthetic.main.fragment_turn.*
-import kotlinx.android.synthetic.main.nav_header_nav_menu.*
+import kotlinx.android.synthetic.main.fragment_unsharp_masking.*
 
 class TurnFragment : Fragment() {
 
@@ -29,7 +29,15 @@ class TurnFragment : Fragment() {
     }
     override fun onStart() {
         super.onStart()
+        cancelTurnBtn.setOnClickListener {
+            turnView.setImageBitmap(commonData.imageBitmap)
+            tmpImage = commonData.imageBitmap
+            turnSeek.progress = 0
+        }
 
+        applyTurnBtn.setOnClickListener {
+            commonData.imageBitmap = tmpImage
+        }
         turnView.setImageBitmap(commonData.imageBitmap)
         tmpImage = commonData.imageBitmap
 

@@ -20,7 +20,7 @@
         app:srcCompat="@mipmap/logo" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/cancelBtn"
+        android:id="@+id/cancelFilterBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -31,7 +31,7 @@
         app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/applyBtn"
+        android:id="@+id/applyFilterBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -45,21 +45,24 @@
         android:id="@+id/sepiaBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginTop="8dp"
         android:text="sepia"
-        app:layout_constraintBottom_toTopOf="@+id/cancelBtn"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/photoView" />
 
     <Button
         android:id="@+id/binBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="bin"
-        app:layout_constraintBottom_toTopOf="@+id/cancelBtn"
-        app:layout_constraintStart_toEndOf="@+id/sepiaBtn" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/sepiaBtn"
+        app:layout_constraintTop_toBottomOf="@+id/photoView"
+        app:layout_constraintVertical_bias="0.508" />
 
     <Button
         android:id="@+id/inverseBtn"
@@ -67,9 +70,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="inverse"
-        app:layout_constraintBottom_toTopOf="@+id/applyBtn"
-        app:layout_constraintStart_toEndOf="@+id/binBtn" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/binBtn"
+        app:layout_constraintTop_toBottomOf="@+id/photoView" />
 
     <Button
         android:id="@+id/grayBtn"
@@ -78,9 +83,11 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="gray"
-        app:layout_constraintBottom_toTopOf="@+id/applyBtn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/inverseBtn" />
+        app:layout_constraintStart_toEndOf="@+id/inverseBtn"
+        app:layout_constraintTop_toBottomOf="@+id/photoView" />
 
 </android.support.constraint.ConstraintLayout>

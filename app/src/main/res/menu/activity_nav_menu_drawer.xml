@@ -16,6 +16,9 @@
         <item
             android:id="@+id/turn"
             android:title="Turn Image"/>
+        <item
+            android:id="@+id/zoom"
+            android:title="Zoom Image"/>
     </group>
 
     <item android:title="Other">

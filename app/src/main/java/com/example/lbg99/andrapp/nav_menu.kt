@@ -136,6 +136,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.turn -> {
                 addFragmentToActivity(TurnFragment())
             }
+            R.id.zoom -> {
+                addFragmentToActivity(ZoomFragment())
+            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
