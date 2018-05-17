@@ -38,8 +38,7 @@ class FilterFragment : Fragment() {
         curPath = commonData.currentPhotoPath
         tmpImage = commonData.imageBitmap
         photoView.setImageBitmap(tmpImage)
-        pixels = commonData.pixels
-        oldPixels = pixels
+        pixels = getPixelsMatrix(tmpImage)
 
         cancelFilterBtn.setOnClickListener {
             pixels = oldPixels
@@ -69,8 +68,16 @@ class FilterFragment : Fragment() {
 
         applyFilterBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
-            commonData.pixels = pixels
         }
+    }
+
+    fun getPixelsMatrix(tmpImage: Bitmap?): Array<IntArray>? { //получает матрицу пикселей из bitmap (просто интовые байты)
+        var arr = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
+        for(i in 0 until tmpImage!!.width)
+            for(j in 0 until tmpImage!!.height) {
+                arr[i][j]= tmpImage!!.getPixel(i,j)
+            }
+        return arr // закинули в глобальный массив
     }
 
     fun bin(pxl : Array<IntArray>?) : Bitmap? {

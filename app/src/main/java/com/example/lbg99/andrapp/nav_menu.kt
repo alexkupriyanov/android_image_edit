@@ -34,7 +34,6 @@ class commonData {
     companion object {
         var imageBitmap: Bitmap? = null
         var currentPhotoPath: String? = null
-        var pixels: Array<IntArray>? = null
     }
     fun saveChange() {
         val file = File(currentPhotoPath)
@@ -50,7 +49,6 @@ class commonData {
     }
     fun init(newBitmap: Bitmap?) {
         imageBitmap = newBitmap
-        pixels = getPixelsMatrix(imageBitmap)
         val root = Environment.getExternalStorageDirectory().toString()
         val myDir = File(root + "/capture_photo")
         myDir.mkdirs()
@@ -62,14 +60,6 @@ class commonData {
     }
 }
 
-fun getPixelsMatrix(tmpImage: Bitmap?): Array<IntArray>? { //получает матрицу пикселей из bitmap (просто интовые байты)
-    var arr = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
-    for(i in 0 until tmpImage!!.width)
-        for(j in 0 until tmpImage!!.height) {
-            arr[i][j]= tmpImage!!.getPixel(i,j)
-        }
-    return arr // закинули в глобальный массив
-}
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     val manager = supportFragmentManager
 
