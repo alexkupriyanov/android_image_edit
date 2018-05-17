@@ -11,6 +11,9 @@
         <item
             android:id="@+id/frag"
             android:title="Frag"/>
+        <item
+            android:id="@+id/opencv1"
+            android:title="Open CV"/>
     </group>
 
     <item android:title="Other">

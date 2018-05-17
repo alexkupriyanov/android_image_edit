@@ -20,6 +20,8 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+
 class commonData {
     companion object {
         var imageBitmap: Bitmap? = null
@@ -120,6 +122,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                 addFragmentToActivity(FilterFragment())
             }
             R.id.frag -> {
+            }
+            R.id.opencv1 -> {
+                addFragmentToActivity(OpencvFrag())
             }
 
         }
