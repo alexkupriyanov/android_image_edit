@@ -168,7 +168,7 @@ class UnsharpMaskingFragment : Fragment() {
                     if (B > 255) B = 255
                     if (B < 0) B = 0
                 }
-                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B));
+                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B))
             }
         }
 
