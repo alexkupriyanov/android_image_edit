@@ -20,8 +20,7 @@ import android.content.DialogInterface
 import android.support.v7.app.AlertDialog
 import android.opengl.ETC1.getHeight
 import android.opengl.ETC1.getWidth
-
-
+import java.util.Collections.rotate
 
 
 class Filters :AppCompatActivity() {
@@ -40,6 +39,7 @@ class Filters :AppCompatActivity() {
     private var pixels: Array<IntArray>? = null
 
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filters)
@@ -201,12 +201,97 @@ class Filters :AppCompatActivity() {
 
 
         })
+
+
         trigl.setOnClickListener {
             workWithTriangles()
         }
 button2.setOnClickListener {
     zoom()
 }
+        val relativeLayout = findViewById(R.id.relativeLayout) as RelativeLayout
+        val retouchSeekBar = findViewById(R.id.rad) as SeekBar
+        val radius = retouchSeekBar.getProgress() +1
+        val image = findViewById(R.id.Image) as ImageView
+        image.setOnTouchListener(object:View.OnTouchListener {
+        override  fun  onTouch(v:View, event:MotionEvent):Boolean {
+
+            if (event.getAction() === MotionEvent.ACTION_MOVE){
+                    var x = event.x
+                    var y = event.y
+                    val m_size = 2 * radius + 1
+                    var x1 = 0
+                    var y1 = 0
+                    var sum = 0.0
+                val width = tmpImage!!.width
+                val height = tmpImage!!.height
+                    var pixels = IntArray(width * height)
+                    tmpImage!!.getPixels(pixels, 0, width, 0, 0, width, height)
+                var sumR = 0
+                var sumG = 0
+                var sumB = 0
+                var count = 0
+                    val weights = Array<DoubleArray>(m_size, {DoubleArray(m_size)})
+                    for (i in -radius until radius)// считаем коэффициент и количество пикселей в выбранном радиусе
+                    {
+                        for (j in -radius until radius)
+                        {
+                            val dX = i.toDouble()
+                            val dY = j.toDouble()
+                            val dR = radius.toDouble()
+                            weights[x1][y1] = (Math.pow(Math.E, -((dX * dX + dY * dY) / (2.0 * dR * dR)))) * 0.2
+                            y1++
+                        }
+                        y1 = 0
+                        x1++
+                    }
+                    if(x<0||y<0||x>width||y>height) return true //проверка на случай если пользователь проводит в углу картинки
+
+                  val s1= (x - radius).toInt()
+                    val f1=(x + radius).toInt()
+                    val s2= (y - radius).toInt()
+                    val f2=(y + radius).toInt()
+                    for (i in s1 until f1) {
+                        for (j in s2 until f2) {
+                            var h=Math.sqrt(((x - i) * (x - i) + (y - j) * (y - j)).toDouble()).toInt()
+                            if (h <= radius && i > 0 && j > 0 && i < width && j < height)
+                            {
+
+                                sumR += Color.red(pixels[j*width*+i])
+                                sumG += Color.green(pixels[j*width*+i])   // считаем сумму для цветов
+                                sumB += Color.blue(pixels[j*width*+i])
+                                count++
+
+                            }
+                        }
+                    }
+                   sumR/=count
+                    sumG/=count  //посчитали усредненный цвет
+                    sumB/=count
+                    x1 = 0
+                    y1 = 0
+                    for (i in s1 until f1) {
+                        for (j in s2 until f2) {
+                            if (Math.sqrt(((x - i) * (x - i) + (y - j) * (y - j)).toDouble()).toInt() <= radius && i > 0 && j > 0 && i < width && j < height)
+                            {
+
+                               var  R = (sumR * weights[x1][y1]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[x1][y1])) as Int
+                                var  G = (sumG * weights[x1][y1]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[x1][y1])) as Int
+                               var  B = (sumB * weights[x1][y1]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[x1][y1])) as Int
+                                y1++
+                                pixels[j * width + i] = 255 * 16777216 +R * 65536 + G * 256 + B
+                            }
+
+                        }
+                         y1=0
+                        x1++
+                    }
+                      tmpImage=Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
+                    Image.setImageBitmap(tmpImage)
+
+            }
+            return true
+        }})
 
     }
 
@@ -266,6 +351,11 @@ button2.setOnClickListener {
        tmpImage = Bitmap.createBitmap(newPixels, w2, h2, Bitmap.Config.ARGB_8888)
     }
 
+    fun retouch( value: Double){
+
+
+
+        }
     fun  applyGaussianBlur(src: Bitmap, radius: Int,threshold:Double,amount:Double): Bitmap  {
 
         val SIZE = 2 * radius + 1
