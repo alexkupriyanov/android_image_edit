@@ -129,6 +129,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.zoom -> {
                 addFragmentToActivity(ZoomFragment())
             }
+            R.id.retouch -> {
+                addFragmentToActivity(RetouchFragment())
+            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
