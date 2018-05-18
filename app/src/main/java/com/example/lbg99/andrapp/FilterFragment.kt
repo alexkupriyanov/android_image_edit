@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+//import com.example.lbg99.andrapp.R.id.contrastBtn
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 class FilterFragment : Fragment() {
@@ -63,6 +64,11 @@ class FilterFragment : Fragment() {
 
         grayBtn.setOnClickListener {
             tmpImage = gray(pixels)
+            photoView.setImageBitmap(tmpImage)
+        }
+
+        blurBtn.setOnClickListener {
+            tmpImage = blur(pixels)
             photoView.setImageBitmap(tmpImage)
         }
 
@@ -202,27 +208,102 @@ class FilterFragment : Fragment() {
         return tmp
     }
 
-    override fun onResume() {
-        super.onResume()
+    fun blur(pxl : Array<IntArray>?): Bitmap? {
+
+        val radius = 5
+        var src = commonData.imageBitmap
+        val SIZE = 2 * radius + 1
+        var sum = 0.0
+        var pixels = IntArray(src!!.width * src!!.height)
+        val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
+        val width = src.width
+        val height = src.height
+        src.getPixels(pixels, 0, width, 0, 0, width, height)
+        var sumR: Double
+        var sumG: Double  // переменные для вычисления суммы цвета
+        var sumB: Double
+
+        var x1 = 0
+        var y1 = 0
+        val result = Bitmap.createBitmap(width, height, src.config)
+
+        for (x in -radius until radius) {
+            for (y in -radius until radius) {
+                weights[x1][y1] = (Math.pow(Math.E, (-((x * x + y * y) / (2 * radius * radius))).toDouble())) / (2 * Math.PI * radius * radius)
+                // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                sum += weights[x1][y1]
+                y1++
+            }
+            y1 = 0
+            x1++
+        }
+
+        if (sum == 0.0)  // чтобы избежать деления на 0
+            sum = 1.0
+
+        for (y in 0 until height - SIZE + 1) {
+            for (x in 0 until width - SIZE + 1) {
+
+
+                sumB = 0.0
+                sumG = sumB
+                sumR = sumG
+
+                for (i in 0 until SIZE) {
+                    for (j in 0 until SIZE) {
+                        sumR += ((Color.red(pixels[x + i + width * (y + j)]) * weights[i][j]))
+                        sumG += ((Color.green(pixels[x + i + width * (y + j)]) * weights[i][j]))  // считаем сумму для цветов
+                        sumB += ((Color.blue(pixels[x + i + width * (y + j)]) * weights[i][j]))
+                    }
+                }
+
+                var R = (sumR / sum).toInt()
+                if (R < 0) {
+                    R = 0
+                } else if (R > 255) {
+                    R = 255
+                }
+                // получаем итоговые цвета
+                var G = (sumG / sum).toInt()
+                if (G < 0) {
+                    G = 0
+                } else if (G > 255) {
+                    G = 255
+                }
+
+                var B = (sumB / sum).toInt()
+                if (B < 0) {
+                    B = 0
+                } else if (B > 255) {
+                    B = 255
+                }
+                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B))
+            }
+        }
+        return result
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
+            override fun onResume() {
+                super.onResume()
+            }
 
-    override fun onPause() {
-        super.onPause()
-    }
+            override fun onStop() {
+                super.onStop()
+            }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
+            override fun onPause() {
+                super.onPause()
+            }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
+            override fun onDestroy() {
+                super.onDestroy()
+            }
 
-    override fun onDetach() {
-        super.onDetach()
+            override fun onDestroyView() {
+                super.onDestroyView()
+            }
+
+             override fun onDetach() {
+                super.onDetach()
     }
 }
