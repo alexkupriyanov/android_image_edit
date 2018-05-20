@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/turnView"
-        android:layout_width="0dp"
-        android:layout_height="381dp"
+        android:layout_width="@dimen/width"
+        android:layout_height="@dimen/height"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
