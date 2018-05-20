@@ -78,7 +78,7 @@ class ZoomFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 if (zoom != 1.0) {
-                    tmpImage = Zoom(zoom * 100.0, commonData.imageBitmap)
+                    tmpImage = Zoom(zoom, commonData.imageBitmap)
                     zoomView.setImageBitmap(tmpImage)
                 }
                 else
@@ -253,16 +253,14 @@ class ZoomFragment : Fragment() {
     }
 
     fun Zoom(value: Double, zoomImage: Bitmap?): Bitmap? {
-        var value = value
         //инициализация переменных перед преобазованием
-        value /= 100.0
         val w = zoomImage!!.getWidth()
         val h = zoomImage!!.getHeight()
         val pixels = IntArray(w * h)
         zoomImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
         //растяжение/сжатие
         val newPixels: IntArray
-        if (Math.abs(value) > 1) {
+        if (value > 1) {
             newPixels = bilinear_filt(value, value, w, h, pixels)
         } else {
             newPixels = trilinear_filt(value, value, w, h, pixels)

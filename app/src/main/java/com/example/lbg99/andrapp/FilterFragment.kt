@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.Spinner
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 class FilterFragment : Fragment() {
@@ -48,6 +51,43 @@ class FilterFragment : Fragment() {
 
         applyFilterBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
+        }
+
+        filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                when (position) {
+                    0 -> {
+                        Toast.makeText(context, "Choose filter", Toast.LENGTH_LONG).show()
+                    }
+
+                    1 -> {
+                        tmpImage = bin(pixels)
+                        pixels = getPixelsMatrix(tmpImage)
+                        photoView.setImageBitmap(tmpImage)
+                    }
+
+                    2 -> {
+                        tmpImage = inverse(pixels)
+                        pixels = getPixelsMatrix(tmpImage)
+                        photoView.setImageBitmap(tmpImage)
+                    }
+
+                    3 -> {
+                        tmpImage = gray(pixels)
+                        pixels = getPixelsMatrix(tmpImage)
+                        photoView.setImageBitmap(tmpImage)
+                    }
+
+                    4 -> {
+                        tmpImage = sepia(pixels)
+                        pixels = getPixelsMatrix(tmpImage)
+                        photoView.setImageBitmap(tmpImage)
+                    }
+                }
+            }
         }
     }
 
