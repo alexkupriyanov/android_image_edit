@@ -46,26 +46,6 @@ class FilterFragment : Fragment() {
             photoView.setImageBitmap(tmpImage)
         }
 
-        sepiaBtn.setOnClickListener {
-            tmpImage = sepia(pixels)
-            photoView.setImageBitmap(tmpImage)
-        }
-
-        binBtn.setOnClickListener {
-            tmpImage = bin(pixels)
-            photoView.setImageBitmap(tmpImage)
-        }
-
-        inverseBtn.setOnClickListener {
-            tmpImage = inverse(pixels)
-            photoView.setImageBitmap(tmpImage)
-        }
-
-        grayBtn.setOnClickListener {
-            tmpImage = gray(pixels)
-            photoView.setImageBitmap(tmpImage)
-        }
-
         applyFilterBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
