@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import android.widget.SeekBar
 import kotlinx.android.synthetic.main.fragment_turn.*
 import kotlinx.android.synthetic.main.fragment_unsharp_masking.*
@@ -32,7 +33,13 @@ class TurnFragment : Fragment() {
         cancelTurnBtn.setOnClickListener {
             turnView.setImageBitmap(commonData.imageBitmap)
             tmpImage = commonData.imageBitmap
-            turnSeek.progress = 0
+        }
+        picker.minValue = 0
+        picker.maxValue = 360
+
+        doTurnBtn.setOnClickListener {
+           tmpImage = Rotate(picker.value.toDouble(), commonData.imageBitmap)
+            turnView.setImageBitmap(tmpImage)
         }
 
         applyTurnBtn.setOnClickListener {
@@ -40,22 +47,6 @@ class TurnFragment : Fragment() {
         }
         turnView.setImageBitmap(commonData.imageBitmap)
         tmpImage = commonData.imageBitmap
-
-        turnSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                degreeValue.text =  turnSeek.progress.toString()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-                tmpImage = Rotate(turnSeek.progress.toDouble(), commonData.imageBitmap)
-                turnView.setImageBitmap(tmpImage)
-            }
-        })
     }
     fun Rotate(value: Double, bitmap: Bitmap?) : Bitmap {
         var value = value
