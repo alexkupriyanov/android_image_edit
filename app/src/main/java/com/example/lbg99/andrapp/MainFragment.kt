@@ -97,7 +97,7 @@ class MainFragment : Fragment() {
                 commonData.imageBitmap = Zoom(Math.min(resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.width,
                         resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.height), commonData.imageBitmap)
             }
-            photoImageView.setImageBitmap(imageBitmap)
+            photoImageView.setImageBitmap(commonData.imageBitmap)
 
 
         }
@@ -108,7 +108,7 @@ class MainFragment : Fragment() {
                 commonData.imageBitmap = Zoom(Math.min(resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.width,
                         resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.height), commonData.imageBitmap)
             }
-            photoImageView.setImageBitmap(imageBitmap)
+            photoImageView.setImageBitmap(commonData.imageBitmap)
         }
     }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
