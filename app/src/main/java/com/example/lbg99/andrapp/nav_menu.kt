@@ -25,6 +25,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import java.io.File
@@ -38,6 +39,7 @@ class commonData {
     companion object {
         var imageBitmap: Bitmap? = null
         var currentPhotoPath: String? = null
+        var scaleFactor : Int = 1
     }
     fun saveChange() {
         val file = File(currentPhotoPath)
@@ -61,6 +63,26 @@ class commonData {
         val file = File(myDir, OutletFname)
         currentPhotoPath = file.absolutePath
         saveChange()
+        fixSize()
+    }
+
+    fun fixSize() {
+        val targetW = 720
+        val targetH = 1128
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        val photoW = imageBitmap!!.width
+        val photoH = imageBitmap!!.height
+        if (photoH > targetH || photoW > targetW) {
+            scaleFactor = Math.max(photoW / targetW, photoH / targetH)
+            bmOptions.inJustDecodeBounds = false
+            bmOptions.inSampleSize = scaleFactor
+            bmOptions.inPurgeable = true
+            imageBitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions)
+            Log.i(">>>>>", "mBitmap.getWidth()=" + imageBitmap!!.width)
+            Log.i(">>>>>", "mBitmap.getHeight()=" + imageBitmap!!.height)
+            saveChange()
+        }
     }
 }
 

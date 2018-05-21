@@ -50,13 +50,10 @@ class RetouchFragment : Fragment() {
                     var y = event.y
                     if (x > retouchView.width / 2 + tmpImage!!.width / 2 || x < retouchView.width / 2 - tmpImage!!.width / 2
                     || y > retouchView.height / 2 + tmpImage!!.height / 2 || y < retouchView.height / 2 - tmpImage!!.height / 2) {
-                        Toast.makeText(context,"Вне области изображения", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context,"Out of picture", Toast.LENGTH_SHORT).show()
                         return true
                     }
                     val m_size = 2 * radius + 1
-                    var x1 = 0
-                    var y1 = 0
-                    var sum = 0.0
                     val width = tmpImage!!.width
                     val height = tmpImage!!.height
                     var pixels = IntArray(width * height)
@@ -73,44 +70,36 @@ class RetouchFragment : Fragment() {
                             val dX = i.toDouble()
                             val dY = j.toDouble()
                             val dR = radius.toDouble()
-                            weights[x1][y1] = (Math.pow(Math.E, -((dX * dX + dY * dY) / (2.0 * dR * dR)))) * 0.2
-                            y1++
+                            weights[i + radius][j + radius] = (Math.pow(Math.E, -((dX * dX + dY * dY) / (2.0 * dR * dR)))) * 0.25
                         }
-                        y1 = 0
-                        x1++
                     }
-                    val s1= (x - radius).toInt() - retouchView.width / 2 + width / 2
-                    val f1=(x + radius).toInt() - retouchView.width / 2 + width / 2
-                    val s2= (y - radius).toInt() - retouchView.height / 2 + height / 2
-                    val f2=(y + radius).toInt() - retouchView.height / 2 + height / 2
+                    val s1= Math.max(0, Math.min(width, (x - radius).toInt() - retouchView.width / 2 + width / 2))
+                    val f1= Math.max(0, Math.min(width, (x + radius).toInt() - retouchView.width / 2 + width / 2))
+                    val s2= Math.max(0, Math.min(height, (y - radius).toInt() - retouchView.height / 2 + height / 2))
+                    val f2= Math.max(0, Math.min(height, (y + radius).toInt() - retouchView.height / 2 + height / 2))
                     for (i in s1 until f1) {
                         for (j in s2 until f2) {
-                            var h=Math.sqrt(((x - i) * (x - i) + (y - j) * (y - j)).toDouble()).toInt()
-
-                                sumR += Color.red(pixels[j*width+i])
-                                sumG += Color.green(pixels[j*width+i])   // считаем сумму для цветов
-                                sumB += Color.blue(pixels[j*width+i])
-                                Log.d("RGB", "$i || $j")
+                                sumR += Color.red(pixels[j * width + i])
+                                sumG += Color.green(pixels[j * width + i])   // считаем сумму для цветов
+                                sumB += Color.blue(pixels[j * width + i])
                                 count++
                         }
                     }
                     sumR/=count
                     sumG/=count  //посчитали усредненный цвет
                     sumB/=count
-                    x1 = 0
-                    y1 = 0
                     for (i in s1 until f1) {
                         for (j in s2 until f2) {
-                                var  R = (sumR * weights[x1][y1]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[x1][y1])).toInt()
-                                var  G = (sumG * weights[x1][y1]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[x1][y1])).toInt()
-                                var  B = (sumB * weights[x1][y1]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[x1][y1])).toInt()
-                                y1++
-                                pixels[j * width + i] = 255 * 16777216 +R * 65536 + G * 256 + B
+                            var  R = (sumR * weights[i - s1][j - s2]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
+                            var  G = (sumG * weights[i - s1][j - s2]).toInt() + (Color.green(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
+                            var  B = (sumB * weights[i - s1][j - s2]).toInt() + (Color.blue(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
+                            R = Math.max(0.0, Math.min(255.0, R))
+                            G = Math.max(0.0, Math.min(255.0, G))
+                            B = Math.max(0.0, Math.min(255.0, B))
+                            pixels[j * width + i] = 255 shl 24 or (R.toInt() shl 16) or (G.toInt() shl 8) or B.toInt()
                         }
-                        y1=0
-                        x1++
                     }
-                    tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
+                    tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                     retouchView.setImageBitmap(tmpImage)
 
                 }

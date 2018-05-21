@@ -92,22 +92,14 @@ class MainFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
             imageBitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver,selectedImage)
-            commonData.imageBitmap = imageBitmap
-            if (commonData.imageBitmap!!.width > resources.getDimension(R.dimen.width) || commonData.imageBitmap!!.height > resources.getDimension(R.dimen.height)) {
-                commonData.imageBitmap = Zoom(Math.min(resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.width,
-                        resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.height), commonData.imageBitmap)
-            }
+            commonData().init(imageBitmap)
             photoImageView.setImageBitmap(commonData.imageBitmap)
 
 
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
-            commonData.imageBitmap = imageBitmap
-            if (commonData.imageBitmap!!.width > resources.getDimension(R.dimen.width) || commonData.imageBitmap!!.height > resources.getDimension(R.dimen.height)) {
-                commonData.imageBitmap = Zoom(Math.min(resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.width,
-                        resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.height), commonData.imageBitmap)
-            }
+            commonData().init(imageBitmap)
             photoImageView.setImageBitmap(commonData.imageBitmap)
         }
     }
@@ -117,15 +109,7 @@ class MainFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
-
-
         photoImageView.setImageBitmap(commonData.imageBitmap)
-
-        if (commonData.imageBitmap!!.width > resources.getDimension(R.dimen.width) || commonData.imageBitmap!!.height > resources.getDimension(R.dimen.height)) {
-            commonData.imageBitmap = Zoom(Math.min(resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.width,
-                    resources.getDimension(R.dimen.width).toDouble() / commonData.imageBitmap!!.height), commonData.imageBitmap)
-        }
 
         fab.setOnClickListener {
             val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))

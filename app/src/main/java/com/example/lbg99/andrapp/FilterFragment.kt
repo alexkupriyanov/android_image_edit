@@ -41,7 +41,6 @@ class FilterFragment : Fragment() {
         curPath = commonData.currentPhotoPath
         tmpImage = commonData.imageBitmap
         photoView.setImageBitmap(tmpImage)
-        pixels = getPixelsMatrix(tmpImage)
 
         cancelFilterBtn.setOnClickListener {
             pixels = oldPixels
@@ -58,10 +57,9 @@ class FilterFragment : Fragment() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position > 0 && pixels == null)
+                    pixels = getPixelsMatrix(tmpImage)
                 when (position) {
-                    0 -> {
-                        Toast.makeText(context, "Choose filter", Toast.LENGTH_LONG).show()
-                    }
 
                     1 -> {
                         tmpImage = bin(pixels)
