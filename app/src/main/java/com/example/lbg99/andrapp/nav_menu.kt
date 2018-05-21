@@ -9,21 +9,15 @@ import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_nav_menu.*
 import kotlinx.android.synthetic.main.app_bar_nav_menu.*
-import android.content.DialogInterface
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.FragmentManager
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
-import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v4.content.FileProvider
-import android.widget.ImageView
-import android.widget.Toast
+import android.support.v4.content.ContextCompat
+import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -34,6 +28,7 @@ class commonData {
     companion object {
         var imageBitmap: Bitmap? = null
         var currentPhotoPath: String? = null
+        var scaleFactor: Int = 1
     }
     fun saveChange() {
         val file = File(currentPhotoPath)
@@ -57,6 +52,25 @@ class commonData {
         val file = File(myDir, OutletFname)
         currentPhotoPath = file.absolutePath
         saveChange()
+        fixSize()
+    }
+    private fun fixSize() {
+        val targetW = 720
+        val targetH = 1128
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        val photoW = imageBitmap!!.width
+        val photoH = imageBitmap!!.height
+        if (photoH > targetH || photoW > targetW) {
+            scaleFactor = Math.max(photoW / targetW, photoH / targetH) + 1
+            bmOptions.inJustDecodeBounds = false
+            bmOptions.inSampleSize = scaleFactor
+            bmOptions.inPurgeable = true
+            imageBitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions)
+            Log.i(">>>>>", "mBitmap.getWidth()=" + imageBitmap!!.width)
+            Log.i(">>>>>", "mBitmap.getHeight()=" + imageBitmap!!.height)
+            saveChange()
+        }
     }
 }
 
@@ -71,7 +85,10 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nav_menu)
         setSupportActionBar(toolbar)
-
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),0)
+        }
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)

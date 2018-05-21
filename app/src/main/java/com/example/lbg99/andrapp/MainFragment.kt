@@ -89,15 +89,15 @@ class MainFragment : Fragment() {
         super .onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
-            imageBitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver,selectedImage)
+            val bmp= MediaStore.Images.Media.getBitmap(activity?.contentResolver,selectedImage)
+            commonData().init(bmp)
             photoImageView.setImageBitmap(imageBitmap)
-            commonData.imageBitmap = imageBitmap
 
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            val bmp = BitmapFactory.decodeFile(mCurrentPhotoPath)
+            commonData().init(bmp)
             photoImageView.setImageBitmap(imageBitmap)
-            commonData.imageBitmap = imageBitmap
         }
     }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
