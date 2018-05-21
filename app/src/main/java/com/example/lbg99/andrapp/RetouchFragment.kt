@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.Toast
+import kotlinx.android.synthetic.main.fragment_filter.*
 import kotlinx.android.synthetic.main.fragment_retouch.*
 import kotlinx.android.synthetic.main.nav_header_nav_menu.*
 
@@ -41,6 +42,15 @@ class RetouchFragment : Fragment() {
                 radius = radiusRetouchPicker.value
             }
         })
+
+        cancelRetouchBtn.setOnClickListener {
+            tmpImage = commonData.imageBitmap
+            retouchView.setImageBitmap(tmpImage)
+        }
+
+        applyRetouchBtn.setOnClickListener {
+            commonData.imageBitmap = tmpImage
+        }
 
         retouchView.setOnTouchListener(object:View.OnTouchListener {
             override  fun  onTouch(v:View, event: MotionEvent):Boolean {
@@ -77,7 +87,7 @@ class RetouchFragment : Fragment() {
                     val f1= Math.max(0, Math.min(width, (x + radius).toInt() - retouchView.width / 2 + width / 2))
                     val s2= Math.max(0, Math.min(height, (y - radius).toInt() - retouchView.height / 2 + height / 2))
                     val f2= Math.max(0, Math.min(height, (y + radius).toInt() - retouchView.height / 2 + height / 2))
-                    for (i in s1 until f1) {
+                    /*for (i in s1 until f1) {
                         for (j in s2 until f2) {
                                 sumR += Color.red(pixels[j * width + i])
                                 sumG += Color.green(pixels[j * width + i])   // считаем сумму для цветов
@@ -98,7 +108,39 @@ class RetouchFragment : Fragment() {
                             B = Math.max(0.0, Math.min(255.0, B))
                             pixels[j * width + i] = 255 shl 24 or (R.toInt() shl 16) or (G.toInt() shl 8) or B.toInt()
                         }
+                    }*/
+
+                    /*ver 2.0--------round-------------------------------*/
+                    for (i in s1 until f1) {
+
+                        var smth = Math.sqrt((radius*radius - (i - (x - retouchView.width / 2 + width / 2 ))*(i - (x - retouchView.width / 2 + width / 2 ))).toDouble())
+                        var newY = y  - retouchView.height / 2 + height / 2
+                        for (j in Math.max(s2, Math.min(f2, (newY - smth).toInt()))
+                                until Math.max(s2, Math.min(f2, (newY + smth).toInt()))) {
+                            sumR += Color.red(pixels[j * width + i])
+                            sumG += Color.green(pixels[j * width + i])   // считаем сумму для цветов
+                            sumB += Color.blue(pixels[j * width + i])
+                            count++
+                        }
                     }
+                    sumR/=count
+                    sumG/=count  //посчитали усредненный цвет
+                    sumB/=count
+                    for (i in s1 until f1) {
+                        var smth = Math.sqrt((radius*radius - (i - (x - retouchView.width / 2 + width / 2 ))*(i - (x - retouchView.width / 2 + width / 2 ))).toDouble())
+                        var newY = y  - retouchView.height / 2 + height / 2
+                        for (j in Math.max(s2, Math.min(f2, (newY - smth).toInt()))
+                                until Math.max(s2, Math.min(f2, (newY + smth).toInt()))) {
+                            var  R = (sumR * weights[i - s1][j - s2]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
+                            var  G = (sumG * weights[i - s1][j - s2]).toInt() + (Color.green(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
+                            var  B = (sumB * weights[i - s1][j - s2]).toInt() + (Color.blue(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
+                            R = Math.max(0.0, Math.min(255.0, R))
+                            G = Math.max(0.0, Math.min(255.0, G))
+                            B = Math.max(0.0, Math.min(255.0, B))
+                            pixels[j * width + i] = 255 shl 24 or (R.toInt() shl 16) or (G.toInt() shl 8) or B.toInt()
+                        }
+                    }
+                    /*------------------------------------------*/
                     tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                     retouchView.setImageBitmap(tmpImage)
 
