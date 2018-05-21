@@ -2,6 +2,7 @@ package com.example.lbg99.andrapp
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -36,6 +37,12 @@ class TurnFragment : Fragment() {
         }
         picker.minValue = 0
         picker.maxValue = 360
+
+        picker.setOnValueChangedListener(object : NumberPicker.OnValueChangeListener{
+            override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
+                turnPreviewImage.setImageBitmap(Rotate(picker!!.value.toDouble(), BitmapFactory.decodeResource(resources, R.mipmap.turn_preview)))
+            }
+        })
 
         doTurnBtn.setOnClickListener {
            tmpImage = Rotate(picker.value.toDouble(), commonData.imageBitmap)

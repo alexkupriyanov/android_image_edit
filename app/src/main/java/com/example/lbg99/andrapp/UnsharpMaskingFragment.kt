@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.fragment_unsharp_masking.*
 import android.widget.SeekBar
 import android.graphics.Bitmap
 import android.graphics.Color
+import com.example.lbg99.andrapp.R.id.*
 
 
 class UnsharpMaskingFragment : Fragment() {
@@ -32,60 +33,26 @@ class UnsharpMaskingFragment : Fragment() {
         cancelMaskBtn.setOnClickListener {
             maskingView.setImageBitmap(commonData.imageBitmap)
             tmpImage = commonData.imageBitmap
-            alphaSeek.progress = 0
-            trashSeek.progress = 0
-            radiusSeek.progress = 0
-            alphaValue.text = "0"
-            trashValue.text = "0"
-            radiusValue.text = "1"
-
+            amountPicker.value = amountPicker.minValue
+            trashPicker.value = trashPicker.minValue
+            radiusPicker.value = radiusPicker.minValue
         }
+
+        amountPicker.minValue = 0
+        amountPicker.maxValue = 50
+        trashPicker.minValue = 0
+        trashPicker.maxValue = 255
+        radiusPicker.minValue = 1
+        radiusPicker.maxValue = 10
 
         applyMaskBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
 
         doBtn.setOnClickListener {
-            tmpImage = applyGaussianBlur(commonData.imageBitmap!!, radiusValue.text.toString().toInt() + 1, trashValue.text.toString().toDouble(), alphaValue.text.toString().toDouble())
+            tmpImage = applyGaussianBlur(commonData.imageBitmap!!, radiusPicker.value, trashPicker.value.toDouble(), amountPicker.value.toDouble())
             maskingView.setImageBitmap(tmpImage)
         }
-
-        alphaSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                alphaValue.text = (progress.toDouble()/10).toString()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
-        trashSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                trashValue.text = progress.toInt().toString()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
-        radiusSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                radiusValue.text = (progress + 1).toString()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
     }
 
     fun  applyGaussianBlur(src: Bitmap, radius: Int,threshold:Double,amount:Double): Bitmap  {

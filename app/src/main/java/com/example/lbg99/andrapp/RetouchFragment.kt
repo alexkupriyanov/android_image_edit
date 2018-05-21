@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_retouch.*
 import kotlinx.android.synthetic.main.nav_header_nav_menu.*
@@ -18,7 +19,7 @@ import kotlinx.android.synthetic.main.nav_header_nav_menu.*
 class RetouchFragment : Fragment() {
 
     var tmpImage: Bitmap? = null
-    var radius = 10
+    var radius: Int = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -31,6 +32,16 @@ class RetouchFragment : Fragment() {
         super.onStart()
         retouchView.setImageBitmap(commonData.imageBitmap)
         tmpImage = commonData.imageBitmap
+
+        radiusRetouchPicker.minValue = 1
+        radiusRetouchPicker.maxValue = 50
+
+        radiusRetouchPicker.setOnValueChangedListener(object : NumberPicker.OnValueChangeListener{
+            override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
+                radius = radiusRetouchPicker.value
+            }
+        })
+
         retouchView.setOnTouchListener(object:View.OnTouchListener {
             override  fun  onTouch(v:View, event: MotionEvent):Boolean {
 

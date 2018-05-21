@@ -65,9 +65,8 @@ class ZoomFragment : Fragment() {
                     resizeValue.text = ((progress - zoomSeek.max / 2).toDouble() / 10 + 1).toString()
                     zoom = resizeValue.text.toString().toDouble()
                 } else {
-                    val pre = "1/"
                     val post = ((zoomSeek.max / 2 - progress).toDouble() / 10 + 1).toString()
-                    resizeValue.text = "$pre$post"
+                    resizeValue.text = String.format("%.2f", (1.0 / post.toDouble()))
                     zoom = 1.0 / post.toDouble()
                 }
             }
