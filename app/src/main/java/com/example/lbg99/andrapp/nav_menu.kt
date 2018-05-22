@@ -67,8 +67,8 @@ class commonData {
     }
 
     fun fixSize() {
-        val targetW = 720
-        val targetH = 1128
+        val targetW = 750
+        val targetH = 750
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
         val photoW = imageBitmap!!.width

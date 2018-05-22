@@ -6,18 +6,21 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.SeekBar
+import com.example.lbg99.andrapp.R.id.*
+import com.example.lbg99.andrapp.commonData.Companion.scaleFactor
 import kotlinx.android.synthetic.main.fragment_turn.*
 import kotlinx.android.synthetic.main.fragment_unsharp_masking.*
 
 class TurnFragment : Fragment() {
 
     var tmpImage : Bitmap? = null
-
+    var tmpPreview : Bitmap? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -40,9 +43,25 @@ class TurnFragment : Fragment() {
 
         picker.setOnValueChangedListener(object : NumberPicker.OnValueChangeListener{
             override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
-                turnPreviewImage.setImageBitmap(Rotate(picker!!.value.toDouble(), BitmapFactory.decodeResource(resources, R.mipmap.turn_preview)))
+                turnPreviewImage.setImageBitmap(Rotate(picker!!.value.toDouble(), tmpPreview))
             }
         })
+
+        val targetW = 100
+        val targetH = 100
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        val photoW = commonData.imageBitmap!!.width
+        val photoH = commonData.imageBitmap!!.height
+        if (photoH > targetH || photoW > targetW) {
+            val scaleFactor = Math.max(photoW / targetW, photoH / targetH)
+            bmOptions.inJustDecodeBounds = false
+            bmOptions.inSampleSize = scaleFactor
+            bmOptions.inPurgeable = true
+            tmpPreview = BitmapFactory.decodeFile(commonData.currentPhotoPath, bmOptions)
+            Log.i(">>>>>", "mBitmap.getWidth()=" + commonData.imageBitmap!!.width)
+            Log.i(">>>>>", "mBitmap.getHeight()=" + commonData.imageBitmap!!.height)
+        }
 
         doTurnBtn.setOnClickListener {
            tmpImage = Rotate(picker.value.toDouble(), commonData.imageBitmap)
@@ -52,8 +71,10 @@ class TurnFragment : Fragment() {
         applyTurnBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
-        turnView.setImageBitmap(commonData.imageBitmap)
+        turnPreviewImage.setImageBitmap(tmpPreview)
         tmpImage = commonData.imageBitmap
+        turnView.setImageBitmap(tmpImage)
+
     }
     fun Rotate(value: Double, bitmap: Bitmap?) : Bitmap {
         var value = value

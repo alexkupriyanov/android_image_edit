@@ -87,30 +87,6 @@ class RetouchFragment : Fragment() {
                     val f1= Math.max(0, Math.min(width, (x + radius).toInt() - retouchView.width / 2 + width / 2))
                     val s2= Math.max(0, Math.min(height, (y - radius).toInt() - retouchView.height / 2 + height / 2))
                     val f2= Math.max(0, Math.min(height, (y + radius).toInt() - retouchView.height / 2 + height / 2))
-                    /*for (i in s1 until f1) {
-                        for (j in s2 until f2) {
-                                sumR += Color.red(pixels[j * width + i])
-                                sumG += Color.green(pixels[j * width + i])   // считаем сумму для цветов
-                                sumB += Color.blue(pixels[j * width + i])
-                                count++
-                        }
-                    }
-                    sumR/=count
-                    sumG/=count  //посчитали усредненный цвет
-                    sumB/=count
-                    for (i in s1 until f1) {
-                        for (j in s2 until f2) {
-                            var  R = (sumR * weights[i - s1][j - s2]).toInt() + (Color.red(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
-                            var  G = (sumG * weights[i - s1][j - s2]).toInt() + (Color.green(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
-                            var  B = (sumB * weights[i - s1][j - s2]).toInt() + (Color.blue(pixels[j * width + i]) * (1 - weights[i - s1][j - s2]))
-                            R = Math.max(0.0, Math.min(255.0, R))
-                            G = Math.max(0.0, Math.min(255.0, G))
-                            B = Math.max(0.0, Math.min(255.0, B))
-                            pixels[j * width + i] = 255 shl 24 or (R.toInt() shl 16) or (G.toInt() shl 8) or B.toInt()
-                        }
-                    }*/
-
-                    /*ver 2.0--------round-------------------------------*/
                     for (i in s1 until f1) {
 
                         var smth = Math.sqrt((radius*radius - (i - (x - retouchView.width / 2 + width / 2 ))*(i - (x - retouchView.width / 2 + width / 2 ))).toDouble())
@@ -140,7 +116,6 @@ class RetouchFragment : Fragment() {
                             pixels[j * width + i] = 255 shl 24 or (R.toInt() shl 16) or (G.toInt() shl 8) or B.toInt()
                         }
                     }
-                    /*------------------------------------------*/
                     tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                     retouchView.setImageBitmap(tmpImage)
 
