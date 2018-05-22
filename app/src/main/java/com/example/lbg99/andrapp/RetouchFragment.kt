@@ -99,11 +99,11 @@ class RetouchFragment : Fragment() {
                             count++
                         }
                     }
-                    sumR/=count
-                    sumG/=count  //посчитали усредненный цвет
-                    sumB/=count
+                    sumR /= count
+                    sumG /= count  //посчитали усредненный цвет
+                    sumB /= count
                     for (i in s1 until f1) {
-                        var smth = Math.sqrt((radius*radius - (i - (x - retouchView.width / 2 + width / 2 ))*(i - (x - retouchView.width / 2 + width / 2 ))).toDouble())
+                        var smth = Math.sqrt((radius * radius - (i - (x - retouchView.width / 2 + width / 2 )) * (i - (x - retouchView.width / 2 + width / 2 ))).toDouble())
                         var newY = y  - retouchView.height / 2 + height / 2
                         for (j in Math.max(s2, Math.min(f2, (newY - smth).toInt()))
                                 until Math.max(s2, Math.min(f2, (newY + smth).toInt()))) {

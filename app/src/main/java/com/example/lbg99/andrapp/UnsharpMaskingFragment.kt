@@ -65,17 +65,15 @@ class UnsharpMaskingFragment : Fragment() {
         val height = src.height
         src.getPixels(pixels, 0, width, 0, 0, width, height)
         var sumR: Double
-        var sumG:Double  // переменные для вычисления суммы цвета
+        var sumG: Double  // переменные для вычисления суммы цвета
         var sumB: Double
-
         var x1 = 0
         var y1 = 0
         val result = Bitmap.createBitmap(width, height, src.config)
 
         for (x in -radius until radius) {
             for (y in -radius until radius) {
-                weights[x1][y1] = (Math.pow (Math.E, (-((x*x+y*y)/(2*radius*radius))).toDouble())) / (2*PI*radius*radius)
-                // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                weights[x1][y1] = (Math.pow (Math.E, (-((x * x + y * y) / (2 * radius * radius))).toDouble())) / (2 * PI * radius * radius)
                 sum += weights[x1][y1]
                 y1++
             }
@@ -88,11 +86,9 @@ class UnsharpMaskingFragment : Fragment() {
 
         for (y in 0 until height - SIZE + 1) {
             for (x in 0 until width - SIZE + 1) {
-
-
                 sumB = 0.0
-                sumG = sumB
-                sumR = sumG
+                sumG = 0.0
+                sumR = 0.0
 
                 for (i in 0 until SIZE) {
                     for (j in 0 until SIZE) {
@@ -102,44 +98,24 @@ class UnsharpMaskingFragment : Fragment() {
                     }
                 }
 
-                var R = (sumR/sum).toInt()
-                if (R < 0) {
-                    R = 0
-                } else if (R > 255) {
-                    R = 255
-                }
                 // получаем итоговые цвета
-                var G = (sumG/sum).toInt()
-                if (G < 0) {
-                    G = 0
-                } else if (G > 255) {
-                    G = 255
-                }
+                var R = Math.max(0, Math.min(255, (sumR / sum).toInt()))
+                var G = Math.max(0, Math.min(255, (sumG / sum).toInt()))
+                var B = Math.max(0, Math.min(255, (sumB / sum).toInt()))
 
-                var  B = (sumB/sum).toInt()
-                if (B < 0) {
-                    B = 0
-                } else if (B > 255) {
-                    B = 255
-                }
+                var diff = (R - Color.red(pixels[(x+1)+(y+1)*width]) + G - Color.green(pixels[(x+1)+(y+1)*width]) + B - Color.blue(pixels[(x+1)+(y+1)*width])) / 3
 
-                var diff = (R - Color.red(pixels[(x+1)+(y+1)*width]) + G - Color.green(pixels[(x+1)+(y+1)*width]) + B - Color.blue(pixels[(x+1)+(y+1)*width])) / 3;
-                if (Math.abs(2*diff) > threshold) {
-                    R = Color.red(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
-                    G = Color.green(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
-                    B = Color.blue(pixels[(x+1)+(y+1)*width]) + (diff*amount).toInt()
-                    if (R > 255) R = 255
-                    if (R < 0) R = 0
-                    if (G > 255) G = 255
-                    if (G < 0) G = 0
-                    if (B > 255) B = 255
-                    if (B < 0) B = 0
+                if (Math.abs(2 * diff) > threshold) {
+                    R = Color.red(pixels[(x + 1) + (y + 1) * width]) + (diff * amount).toInt()
+                    G = Color.green(pixels[(x + 1) + (y + 1) * width]) + (diff * amount).toInt()
+                    B = Color.blue(pixels[(x + 1) + (y + 1) * width]) + (diff * amount).toInt()
+                    R = Math.max(0, Math.min(255, R))
+                    G = Math.max(0, Math.min(255, G))
+                    B = Math.max(0, Math.min(255, B))
                 }
-                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B));
+                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B))
             }
         }
-
-        //imageview.setImageBitmap(result)
         return result
     }
 

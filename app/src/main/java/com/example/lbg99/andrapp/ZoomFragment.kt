@@ -142,7 +142,7 @@ class ZoomFragment : Fragment() {
     }
 
     fun clear (cnt : Int, index : Array<TextView?>) {
-        for (i in 0..cnt) {
+        for (i in 0 until cnt) {
             val curView = index[i]
             layout1.removeView(curView)
         }

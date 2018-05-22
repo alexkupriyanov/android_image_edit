@@ -93,7 +93,7 @@ class FilterFragment : Fragment() {
         var arr = Array(tmpImage!!.width, { IntArray(tmpImage!!.height) })
         for(i in 0 until tmpImage!!.width)
             for(j in 0 until tmpImage!!.height) {
-                arr[i][j]= tmpImage!!.getPixel(i,j)
+                arr[i][j]= tmpImage!!.getPixel(i, j)
             }
         return arr // закинули в глобальный массив
     }
@@ -107,13 +107,13 @@ class FilterFragment : Fragment() {
                 val r = Color.red(color)
                 val g = Color.green(color)
                 val b = Color.blue(color)
-                val luminance = 0.299 * r + 0.0 + 0.587 * g + 0.0 + 0.114 * b + 0.0
+                val luminance = 0.299 * r + 0.587 * g + 0.114 * b
                 matrix[i][j] = if (luminance > 125) Color.WHITE else Color.BLACK
             }
         var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
         for(i in 0 until matrix!!.size)
             for(j in 0 until matrix[i].size)
-                tmp!!.setPixel(i,j,matrix[i][j])
+                tmp!!.setPixel(i, j, matrix[i][j])
         pixels = matrix
         return tmp
     }
@@ -134,7 +134,7 @@ class FilterFragment : Fragment() {
         var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
         for(i in 0 until matrix!!.size)
             for(j in 0 until matrix[i].size)
-                tmp!!.setPixel(i,j,matrix[i][j])
+                tmp!!.setPixel(i, j, matrix[i][j])
         pixels = matrix
         return tmp
     }
@@ -161,12 +161,9 @@ class FilterFragment : Fragment() {
                 g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
                 b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
                 //Fix values
-                r = if (r < 0) 0 else r
-                r = if (r > 255) 255 else r
-                g = if (g < 0) 0 else g
-                g = if (g > 255) 255 else g
-                b = if (b < 0) 0 else b
-                b = if (b > 255) 255 else b
+                r = Math.max(0, Math.min(255, r))
+                g = Math.max(0, Math.min(255, g))
+                b = Math.max(0, Math.min(255, b))
                 val a = 255
                 val p = a shl 24 or (r shl 16) or (g shl 8) or b
                 matrix[i][j] = p
@@ -174,7 +171,7 @@ class FilterFragment : Fragment() {
         var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
         for(i in 0 until matrix!!.size)
             for(j in 0 until matrix[i].size)
-                tmp!!.setPixel(i,j,matrix[i][j])
+                tmp!!.setPixel(i, j, matrix[i][j])
         pixels = matrix
         return tmp
     }
@@ -202,12 +199,9 @@ class FilterFragment : Fragment() {
                 g = (1.0 * Y - 0.272 * I - 0.647 * Q).toInt()
                 b = (1.0 * Y - 1.105 * I + 1.702 * Q).toInt()
                 //Fix values
-                r = if (r < 0) 0 else r
-                r = if (r > 255) 255 else r
-                g = if (g < 0) 0 else g
-                g = if (g > 255) 255 else g
-                b = if (b < 0) 0 else b
-                b = if (b > 255) 255 else b
+                r = Math.max(0, Math.min(255, r))
+                g = Math.max(0, Math.min(255, g))
+                b = Math.max(0, Math.min(255, b))
                 val a = 255
                 val p = a shl 24 or (r shl 16) or (g shl 8) or b
                 matrix[i][j] = p
@@ -215,7 +209,7 @@ class FilterFragment : Fragment() {
         var tmp: Bitmap? = Bitmap.createBitmap(tmpImage!!.width, tmpImage!!.height, Bitmap.Config.RGB_565)
         for(i in 0 until matrix!!.size)
             for(j in 0 until matrix[i].size)
-                tmp!!.setPixel(i,j,matrix[i][j])
+                tmp!!.setPixel(i, j, matrix[i][j])
         pixels = matrix
         return tmp
     }
