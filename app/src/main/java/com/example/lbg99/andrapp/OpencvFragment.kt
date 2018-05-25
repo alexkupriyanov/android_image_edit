@@ -1,29 +1,24 @@
 package com.example.lbg99.andrapp
 
 import android.app.ProgressDialog
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
 import kotlinx.android.synthetic.main.fragment_opencv.*
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import android.view.Window
+import android.view.WindowManager
 
 
-@Suppress("DEPRECATED_IDENTITY_EQUALS", "DEPRECATION")
+
 class OpencvFragment : Fragment() {
     private var img: Mat? = null
     private var touchCount: Int = 0
@@ -46,6 +41,7 @@ class OpencvFragment : Fragment() {
         rectPaint.setARGB(255,255,0,0)
         rectPaint.style = Paint.Style.STROKE
         rectPaint.strokeWidth = 3F
+
         opencvView.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 val cx = (opencvView.width - commonData.imageBitmap!!.width) / 2
@@ -71,6 +67,21 @@ class OpencvFragment : Fragment() {
             }
         })
         opencvBtn.setOnClickListener{
+            grabcutTask().execute()
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_opencv, container, false)
+    }
+    inner class grabcutTask: AsyncTask<Void, Void, Void>() {
+        override fun onPreExecute() {
+            super.onPreExecute()
+            opencvPB.visibility = View.VISIBLE
+            opencvView.isClickable = false
+            opencvBtn.isClickable = false
+        }
+        override fun doInBackground(vararg params: Void?): Void? {
             var img = Mat(commonData.imageBitmap!!.height,commonData.imageBitmap!!.width, CvType.CV_8UC3)
             Utils.bitmapToMat(commonData.imageBitmap,img)
             Imgproc.cvtColor(img,img,Imgproc.COLOR_RGBA2RGB)
@@ -86,15 +97,20 @@ class OpencvFragment : Fragment() {
             Imgproc.blur(foreground,foreground,Size(10.0,10.0))
             img.copyTo(foreground,firstMask)
             Utils.matToBitmap(foreground,commonData.imageBitmap)
-            opencvView.setImageBitmap(commonData.imageBitmap)
             firstMask.release()
             source.release()
             bgModel.release()
             fgModel.release()
+            return null
         }
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_opencv, container, false)
+        override fun onPostExecute(result: Void?) {
+            super.onPostExecute(result)
+            opencvView.setImageBitmap(commonData.imageBitmap)
+            opencvPB.visibility = View.INVISIBLE
+            opencvView.isClickable = true
+            opencvBtn.isClickable = true
+        }
+
     }
 }
