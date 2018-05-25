@@ -90,7 +90,6 @@ class commonData {
             Log.i(">>>>>", "mBitmap.getHeight()=" + imageBitmap!!.height)
             saveChange()
         }
-        fixSize()
     }
 
 }
