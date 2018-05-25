@@ -15,13 +15,17 @@ import android.app.AlertDialog
 import android.app.FragmentManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import java.io.File
@@ -29,11 +33,13 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.jar.Manifest
 
 class commonData {
     companion object {
         var imageBitmap: Bitmap? = null
         var currentPhotoPath: String? = null
+        var scaleFactor : Int = 1
     }
     fun saveChange() {
         val file = File(currentPhotoPath)
@@ -57,6 +63,26 @@ class commonData {
         val file = File(myDir, OutletFname)
         currentPhotoPath = file.absolutePath
         saveChange()
+        fixSize()
+    }
+
+    fun fixSize() {
+        val targetW = 750
+        val targetH = 750
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        val photoW = imageBitmap!!.width
+        val photoH = imageBitmap!!.height
+        if (photoH > targetH || photoW > targetW) {
+            scaleFactor = Math.max(photoW / targetW, photoH / targetH)
+            bmOptions.inJustDecodeBounds = false
+            bmOptions.inSampleSize = scaleFactor
+            bmOptions.inPurgeable = true
+            imageBitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions)
+            Log.i(">>>>>", "mBitmap.getWidth()=" + imageBitmap!!.width)
+            Log.i(">>>>>", "mBitmap.getHeight()=" + imageBitmap!!.height)
+            saveChange()
+        }
     }
 }
 
@@ -77,6 +103,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+        }
         commonData().init(BitmapFactory.decodeResource(resources,R.mipmap.logo))
         addFragmentToActivity(MainFragment())
     }

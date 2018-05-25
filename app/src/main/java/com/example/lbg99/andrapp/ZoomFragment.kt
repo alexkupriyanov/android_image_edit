@@ -2,6 +2,7 @@ package com.example.lbg99.andrapp
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
@@ -14,15 +15,13 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_zoom.*
-import kotlinx.android.synthetic.main.fragment_zoom.view.*
-import java.util.Collections.rotate
 
 class ZoomFragment : Fragment() {
 
     var tmpImage: Bitmap? = null
     var zoom: Double = 0.0
     var number = 0
-    var coordinates = arrayOfNulls<TextView>(6)
+    var textViews = arrayOfNulls<TextView>(6)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +43,7 @@ class ZoomFragment : Fragment() {
             zoomSeek.progress = zoomSeek.max / 2
             resizeValue.text = "1.0"
             commentText.text = ""
-            clear(number - 1, coordinates)
+            clear(number - 1, textViews)
         }
 
         applyZoomBtn.setOnClickListener {
@@ -56,7 +55,7 @@ class ZoomFragment : Fragment() {
         }
 
         deletePointsBtn.setOnClickListener {
-            clear(number - 1, coordinates)
+            clear(number - 1, textViews)
         }
 
         zoomSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
@@ -65,9 +64,8 @@ class ZoomFragment : Fragment() {
                     resizeValue.text = ((progress - zoomSeek.max / 2).toDouble() / 10 + 1).toString()
                     zoom = resizeValue.text.toString().toDouble()
                 } else {
-                    val pre = "1/"
                     val post = ((zoomSeek.max / 2 - progress).toDouble() / 10 + 1).toString()
-                    resizeValue.text = "$pre$post"
+                    resizeValue.text = String.format("%.2f", (1.0 / post.toDouble()))
                     zoom = 1.0 / post.toDouble()
                 }
             }
@@ -78,7 +76,7 @@ class ZoomFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 if (zoom != 1.0) {
-                    tmpImage = Zoom(zoom * 100.0, commonData.imageBitmap)
+                    tmpImage = Zoom(zoom, commonData.imageBitmap)
                     zoomView.setImageBitmap(tmpImage)
                 }
                 else
@@ -108,21 +106,22 @@ class ZoomFragment : Fragment() {
                         coorY[number] = y.toDouble()
                         //добавление циферки на экран:
                         val mView = TextView(context)
-                        coordinates[number] = mView
+                        textViews[number] = mView
                         val text:String
                         if(number<3){
                             text = "▼"}
                         else { text = "▲"
                         }
-                        coordinates[number]!!.setText("" + text)
+                        textViews[number]!!.setText("" + text)
                         val id = View.generateViewId()
-                        coordinates[number]!!.setId(id)
+                        textViews[number]!!.setId(id)
                         index[number] = id
+                        textViews[number]!!.setTextColor(resources.getColor(R.color.black))
                         val layoutParams = ConstraintLayout.LayoutParams(
                                 ConstraintLayout.LayoutParams.MATCH_PARENT,
                                 ConstraintLayout.LayoutParams.MATCH_PARENT)
                         layoutParams.setMargins(x, y, 0, 0)
-                        relativeLayout.addView(coordinates[number], layoutParams)
+                        relativeLayout.addView(textViews[number], layoutParams)
                         number++
                     }
 //обновление текста после ввода трёх точек
@@ -134,7 +133,7 @@ class ZoomFragment : Fragment() {
                         commentText.text = ""
                         triangl(coorX, coorY)
                         imageview.setImageBitmap(tmpImage)
-                        clear(number - 1, coordinates)
+                        clear(number - 1, textViews)
                     }
                 }
                 return true
@@ -143,7 +142,7 @@ class ZoomFragment : Fragment() {
     }
 
     fun clear (cnt : Int, index : Array<TextView?>) {
-        for (i in 0..cnt) {
+        for (i in 0 until cnt) {
             val curView = index[i]
             layout1.removeView(curView)
         }
@@ -253,16 +252,14 @@ class ZoomFragment : Fragment() {
     }
 
     fun Zoom(value: Double, zoomImage: Bitmap?): Bitmap? {
-        var value = value
         //инициализация переменных перед преобазованием
-        value /= 100.0
         val w = zoomImage!!.getWidth()
         val h = zoomImage!!.getHeight()
         val pixels = IntArray(w * h)
         zoomImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
         //растяжение/сжатие
         val newPixels: IntArray
-        if (Math.abs(value) > 1) {
+        if (value > 1) {
             newPixels = bilinear_filt(value, value, w, h, pixels)
         } else {
             newPixels = trilinear_filt(value, value, w, h, pixels)

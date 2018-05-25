@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
@@ -15,6 +16,7 @@ import android.support.v4.content.FileProvider
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import com.example.lbg99.andrapp.R.id.*
 import com.example.lbg99.andrapp.commonData.Companion.imageBitmap
@@ -90,14 +92,15 @@ class MainFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val selectedImage = data?.data
             imageBitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver,selectedImage)
-            photoImageView.setImageBitmap(imageBitmap)
-            commonData.imageBitmap = imageBitmap
+            commonData().init(imageBitmap)
+            photoImageView.setImageBitmap(commonData.imageBitmap)
+
 
         }
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
             imageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
-            photoImageView.setImageBitmap(imageBitmap)
-            commonData.imageBitmap = imageBitmap
+            commonData().init(imageBitmap)
+            photoImageView.setImageBitmap(commonData.imageBitmap)
         }
     }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -107,6 +110,7 @@ class MainFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         photoImageView.setImageBitmap(commonData.imageBitmap)
+
         fab.setOnClickListener {
             val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
             val builder = AlertDialog.Builder(context)
