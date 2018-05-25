@@ -2,7 +2,7 @@ package com.example.lbg99.andrapp
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
@@ -11,15 +11,12 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.SeekBar
 import android.widget.TextView
+import kotlinx.android.synthetic.main.fragment_triangle.*
 import kotlinx.android.synthetic.main.fragment_zoom.*
-
-class ZoomFragment : Fragment() {
+class TriangleFragment : Fragment() {
 
     var tmpImage: Bitmap? = null
-    var zoom: Double = 0.0
     var number = 0
     var textViews = arrayOfNulls<TextView>(6)
 
@@ -33,46 +30,85 @@ class ZoomFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        tmpImage = commonData.imageBitmap
-        zoomView.setImageBitmap(commonData.imageBitmap)
-        zoomSeek.progress = zoomSeek.max / 2
-        resizeValue.text = (zoomSeek.progress - zoomSeek.max / 2 + 1).toString()
 
-        cancelZoomBtn.setOnClickListener {
-            zoomView.setImageBitmap(commonData.imageBitmap)
-            zoomSeek.progress = zoomSeek.max / 2
-            resizeValue.text = "1.0"
-
-            clear(number - 1, textViews)
+        cancelTriangleBtn.setOnClickListener {
+            triangleView.setImageBitmap(commonData.imageBitmap)
+            commentText.text = ""
         }
 
-        applyZoomBtn.setOnClickListener {
+        applyTriangleBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
 
-        zoomSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (progress >= zoomSeek.max / 2) {
-                    resizeValue.text = ((progress - zoomSeek.max / 2).toDouble() / 10 + 1).toString()
-                    zoom = resizeValue.text.toString().toDouble()
-                } else {
-                    val post = ((zoomSeek.max / 2 - progress).toDouble() / 10 + 1).toString()
-                    resizeValue.text = String.format("%.2f", (1.0 / post.toDouble()))
-                    zoom = 1.0 / post.toDouble()
+        setPointsBtn.setOnClickListener {
+            workWithTriangles()
+        }
+
+        deletePointsBtn.setOnClickListener {
+            clear(number, textViews)
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater!!.inflate(R.layout.fragment_triangle, container, false)
+    }
+    override fun onStop() {
+        super.onStop()
+    }
+
+    fun workWithTriangles() {
+        // инициализация
+        val relativeLayout = layout1
+        val imageview = zoomView
+        number = 0
+        commentText.text = "Выберите три точки начального треугольника"
+        imageview.setOnTouchListener(object : View.OnTouchListener {
+
+            var coorX = DoubleArray(6)
+            var coorY = DoubleArray(6)
+            var index = IntArray(6)
+            override fun onTouch(v: View, event: MotionEvent): Boolean { //при касании
+                if (event.action == MotionEvent.ACTION_UP) {
+                    if (number < 6) { // если ещё не все точки назначены
+
+                        val x = event.x.toInt()//запомним координаты
+                        val y = event.y.toInt()
+                        coorX[number] = x.toDouble()
+                        coorY[number] = y.toDouble()
+                        //добавление циферки на экран:
+                        val mView = TextView(context)
+                        textViews[number] = mView
+                        val text: String
+                        if (number < 3) {
+                            text = "▼"
+                        } else {
+                            text = "▲"
+                        }
+                        textViews[number]!!.setText("" + text)
+                        val id = View.generateViewId()
+                        textViews[number]!!.setId(id)
+                        index[number] = id
+                        textViews[number]!!.setTextColor(resources.getColor(R.color.black))
+                        val layoutParams = ConstraintLayout.LayoutParams(
+                                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                                ConstraintLayout.LayoutParams.MATCH_PARENT)
+                        layoutParams.setMargins(x, y, 0, 0)
+                        relativeLayout.addView(textViews[number], layoutParams)
+                        number++
+                    }
+//обновление текста после ввода трёх точек
+                    if (number == 3) {
+                        commentText.text = "Выберите три точки конечного треугольника"
+                    }
+//вычисление коэффициентов после ввода шести точек
+                    if (number == 6) {
+                        commentText.text = ""
+                        triangl(coorX, coorY)
+                        imageview.setImageBitmap(tmpImage)
+                        clear(number, textViews)
+                    }
                 }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                if (zoom != 1.0) {
-                    tmpImage = Zoom(zoom, commonData.imageBitmap)
-                    zoomView.setImageBitmap(tmpImage)
-                }
-                else
-                    zoomView.setImageBitmap(commonData.imageBitmap)
+                return true
             }
         })
     }
@@ -83,6 +119,121 @@ class ZoomFragment : Fragment() {
             layout1.removeView(curView)
         }
         number = 0
+    }
+
+    fun triangl(coordX: DoubleArray, coordY: DoubleArray) {
+        //вичислим дельту, чтобы решить систему уравнений, узнать коэффициенты матрицы преобразований
+        var delta = coordX[0] * coordY[1] + coordX[1] * coordY[2] + coordX[2] * coordY[0] - coordX[2] * coordY[1] - coordX[1] * coordY[0] - coordX[0] * coordY[2]
+
+
+        //выглядит громоздко, но просто по формуле считаем для каждого коэф-фа дельту по формуле
+        var delta_a11 = coordX[3] * coordY[1] + coordX[4] * coordY[2] + coordX[5] * coordY[0] - coordX[5] * coordY[1] - coordX[4] * coordY[0] - coordX[3] * coordY[2]
+        var delta_a21 = coordX[0] * coordX[4] + coordX[1] * coordX[5] + coordX[2] * coordX[3] - coordX[2] * coordX[4] - coordX[1] * coordX[3] - coordX[0] * coordX[5]
+        var delta_a31 = coordX[0] * coordY[1] * coordX[5] + coordX[1] * coordY[2] * coordX[3] + coordX[2] * coordY[0] * coordX[4] - coordX[2] * coordY[1] * coordX[3] - coordX[1] * coordY[0] * coordX[5] - coordX[0] * coordY[2] * coordX[4]
+        var delta_a12 = coordY[3] * coordY[1] + coordY[4] * coordY[2] + coordY[5] * coordY[0] - coordY[5] * coordY[1] - coordY[4] * coordY[0] - coordY[3] * coordY[2]
+        var delta_a22 = coordX[0] * coordY[4] + coordX[1] * coordY[5] + coordX[2] * coordY[3] - coordX[2] * coordY[4] - coordX[1] * coordY[3] - coordX[0] * coordY[5]
+        var delta_a32 = coordX[0] * coordY[1] * coordY[5] + coordX[1] * coordY[2] * coordY[3] + coordX[2] * coordY[0] * coordY[4] - coordX[2] * coordY[1] * coordY[3] - coordX[1] * coordY[0] * coordY[5] - coordX[0] * coordY[2] * coordY[4]
+
+
+        var a11 = (delta_a11.toDouble() / delta.toDouble())
+        var a21 = delta_a21 / delta
+        var a31 = delta_a31 / delta
+        var a12 = delta_a12 / delta
+        var a22 = delta_a22 / delta
+        var a32 = delta_a32 / delta
+
+        //посчитали детерминатн матрицы
+        var detM = a11 * a22 - a12 * a21
+
+        //вычисление коэффициентов с помощью формулы  https://habr.com/post/278597/
+        val alpha: Double
+        var sy: Double
+        var sx: Double
+        var hx: Double
+
+        if (a22 == 0.0) {
+            alpha = Math.PI / 2
+            sy = (-a21).toDouble()
+        }
+        else {
+            alpha = Math.atan((-a21 / a22).toDouble())
+            sy = a22 / Math.cos(alpha)
+        }
+
+        sx = detM / sy
+
+        if(detM==0.0) detM=1.0 //что бы не делить на 0, это, конечно, не особо возможно
+        //но мало ли...
+
+        hx = ((a11 * a21 + a12 * a22) / detM).toDouble()
+
+        val w = tmpImage!!.width
+        val h = tmpImage!!.height
+        val pixel = IntArray(w * h)
+        tmpImage!!.getPixels(pixel, 0, w, 0, 0, w, h)
+
+        //либо билинейное, либо трилинейное растяжение сжатие
+        var newPixels: IntArray
+        if (Math.abs(sx) * Math.abs(sy) > 1) {
+            newPixels = bilinear_filt(sx, sy, w, h, pixel)
+        }
+        else {
+            newPixels = trilinear_filt(sx, sy, w, h, pixel)
+        }
+
+        var w2 = Math.abs((w * sx).toInt())
+        var h2 = Math.abs((h * sy).toInt())
+
+        //вызов функции перемещения изображения
+        newPixels = perem(hx, 0.0, w2, h2, newPixels)
+        //поворот
+        tmpImage = Rotate(alpha, tmpImage)
+    }
+
+    fun Rotate(value: Double, bitmap: Bitmap?) : Bitmap {
+        var value = Math.toRadians(-value)
+        //инициализация переменных перед преобазованием
+        val w = bitmap!!.width
+        val h = bitmap!!.height
+        val pixels = IntArray(w * h)
+        bitmap!!.getPixels(pixels, 0, w, 0, 0, w, h)
+        val newWidth = (h * Math.abs(Math.sin(value)) + w * Math.abs(Math.cos(value))).toInt()
+        val newHeight = (h * Math.abs(Math.cos(value)) + w * Math.abs(Math.sin(value))).toInt()
+        val newPixels = IntArray(newHeight * newWidth)
+        val oX = w / 2
+        val oY = h / 2 //центр исходной картинки
+        val dX = newWidth / 2 - oX //сдвиг центра
+        val dY = newHeight / 2 - oY //сдвиг центра
+        var pixelA: Int
+        var pixelB: Int
+        var pixelC: Int
+        var pixelD: Int
+        var x: Int
+        var y: Int
+        //вычисление новых пикселей
+        for (i in 0 until newHeight) {
+            for (j in 0 until newWidth) {
+                //исходные координаты
+                x = (oX + (j.toDouble() - oX - dX) * Math.cos(value) - (i.toDouble() - oY - dY) * Math.sin(value)).toInt()
+                y = (oY + (j.toDouble() - oX - dX) * Math.sin(value) + (i.toDouble() - oY - dY) * Math.cos(value)).toInt()
+                if (y > 0 && x > 0 && y < h - 2 && x < w - 2) {
+                    //усреднение пикселей
+                    pixelA = pixels[y * w + x]
+                    pixelB = pixels[y * w + x + 1]
+                    pixelC = pixels[(y + 1) * w + x]
+                    pixelD = pixels[(y + 1) * w + x + 1]
+                    val R = (Color.red(pixelA) + Color.red(pixelB) + Color.red(pixelC) + Color.red(pixelD)) / 4
+                    val G = (Color.green(pixelA) + Color.green(pixelB) + Color.green(pixelC) + Color.green(pixelD)) / 4
+                    val B = (Color.blue(pixelA) + Color.blue(pixelB) + Color.blue(pixelC) + Color.blue(pixelD)) / 4
+                    val Al = (Color.alpha(pixelA) + Color.alpha(pixelB) + Color.alpha(pixelC) + Color.alpha(pixelD)) / 4
+
+                    newPixels[i * newWidth + j] = Al * 16777216 + R * 65536 + G * 256 + B
+                } else {
+                    newPixels[i * newWidth + j] = 0x00FFFFFF
+                }
+            }
+        }
+        return Bitmap.createBitmap(newPixels, newWidth, newHeight, Bitmap.Config.RGB_565)
     }
 
     // описание функции перемещения
@@ -101,33 +252,6 @@ class ZoomFragment : Fragment() {
             }
         }
         return newPixels
-    }
-
-    fun Zoom(value: Double, zoomImage: Bitmap?): Bitmap? {
-        //инициализация переменных перед преобазованием
-        val w = zoomImage!!.getWidth()
-        val h = zoomImage!!.getHeight()
-        val pixels = IntArray(w * h)
-        zoomImage!!.getPixels(pixels, 0, w, 0, 0, w, h)
-        //растяжение/сжатие
-        val newPixels: IntArray
-        if (value > 1) {
-            newPixels = bilinear_filt(value, value, w, h, pixels)
-        } else {
-            newPixels = trilinear_filt(value, value, w, h, pixels)
-        }
-        val w2 = Math.abs((w * value).toInt())
-        val h2 = Math.abs((h * value).toInt())
-        //обновление currentBitmap
-        return Bitmap.createBitmap(newPixels, w2, h2, Bitmap.Config.ARGB_8888)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater!!.inflate(R.layout.fragment_zoom, container, false)
-    }
-
-    override fun onStop() {
-        super.onStop()
     }
 
     fun bilinear_filt(sx: Double, sy: Double, w: Int, h: Int, pixels: IntArray): IntArray {

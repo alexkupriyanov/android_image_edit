@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/alex/test_app/android_image_edit/openCVLibrary341/src/main/aidl/org/opencv/engine/OpenCVEngineInterface.aidl
+ * Original file: D:\\Git\\Photo\\android_image_edit\\openCVLibrary341\\src\\main\\aidl\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**

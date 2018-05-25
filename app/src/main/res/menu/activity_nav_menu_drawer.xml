@@ -7,7 +7,6 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/filters"
-            android:icon="@drawable/ic_menu_camera"
             android:title="Filters" />
         <item
             android:id="@+id/unsharp_masking"
@@ -30,9 +29,9 @@
     <item android:title="Other">
         <menu>
             <item
-                android:id="@+id/filter"
+                android:id="@+id/main"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Filters" />
+                android:title="Main" />
 
         </menu>
     </item>

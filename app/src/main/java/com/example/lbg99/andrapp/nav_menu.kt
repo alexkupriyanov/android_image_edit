@@ -21,7 +21,6 @@ import android.graphics.BitmapFactory
 import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -32,10 +31,8 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Scalar
 import org.opencv.imgproc.Imgproc
-import android.support.v4.content.ContextCompat
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
-import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import java.io.File
@@ -175,6 +172,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             }
             R.id.opencv -> {
                 addFragmentToActivity(OpencvFragment())
+            }
+            R.id.main -> {
+                addFragmentToActivity(MainFragment())
             }
         }
 
