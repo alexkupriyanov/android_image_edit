@@ -31,7 +31,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_save" />
-
     <ImageView
         android:id="@+id/photoImageView"
         android:layout_width="@dimen/width"

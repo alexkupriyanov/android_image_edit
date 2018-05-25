@@ -19,9 +19,19 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
+import android.support.v4.app.ActivityCompat
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
+import android.util.Log
+import com.example.lbg99.andrapp.R.id.opencvView
+import org.opencv.android.Utils
+import org.opencv.core.Core
+import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.Scalar
+import org.opencv.imgproc.Imgproc
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.FileProvider
@@ -83,7 +93,9 @@ class commonData {
             Log.i(">>>>>", "mBitmap.getHeight()=" + imageBitmap!!.height)
             saveChange()
         }
+        fixSize()
     }
+
 }
 
 class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -160,6 +172,9 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             }
             R.id.retouch -> {
                 addFragmentToActivity(RetouchFragment())
+            }
+            R.id.opencv -> {
+                addFragmentToActivity(OpencvFragment())
             }
         }
 

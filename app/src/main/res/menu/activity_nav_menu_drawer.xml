@@ -22,6 +22,9 @@
         <item
             android:id="@+id/retouch"
             android:title="Retouch"/>
+        <item
+            android:id="@+id/opencv"
+            android:title="OpenCV"/>
     </group>
 
     <item android:title="Other">

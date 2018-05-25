@@ -110,7 +110,6 @@ class MainFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         photoImageView.setImageBitmap(commonData.imageBitmap)
-
         fab.setOnClickListener {
             val content = arrayOf(getString(R.string.get_photo), getString(R.string.get_image))
             val builder = AlertDialog.Builder(context)
