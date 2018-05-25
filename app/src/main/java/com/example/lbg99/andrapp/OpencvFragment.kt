@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_opencv.*
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
@@ -41,6 +42,10 @@ class OpencvFragment : Fragment() {
         super.onStart()
         opencvView.setImageBitmap(commonData.imageBitmap)
         dlg = ProgressDialog(context)
+        val rectPaint = Paint()
+        rectPaint.setARGB(255,255,0,0)
+        rectPaint.style = Paint.Style.STROKE
+        rectPaint.strokeWidth = 3F
         opencvView.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 val cx = (opencvView.width - commonData.imageBitmap!!.width) / 2
@@ -53,6 +58,13 @@ class OpencvFragment : Fragment() {
                     } else if (touchCount === 1) {
                         br!!.x = event!!.x.toDouble() - cx
                         br!!.y = event!!.y.toDouble() - cy
+                        var tmpBmp = commonData.imageBitmap
+                        var toDraw = tmpBmp!!.copy(Bitmap.Config.ARGB_8888,true)
+                        var tmpCanvas = Canvas(toDraw)
+                        tmpCanvas.drawBitmap(toDraw,0.toFloat() ,0.toFloat(),null)
+                        tmpCanvas.drawRect(tl!!.x.toFloat(),tl!!.y.toFloat(),br!!.x.toFloat(),br!!.y.toFloat(),rectPaint)
+                        opencvView.setImageBitmap(toDraw)
+                        touchCount = 0
                     }
                 }
                 return true
