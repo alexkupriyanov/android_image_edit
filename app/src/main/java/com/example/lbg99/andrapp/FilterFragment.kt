@@ -87,6 +87,17 @@ class FilterFragment : Fragment() {
                         tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                         photoView.setImageBitmap(tmpImage)
                     }
+
+                    5-> {
+                        pixels= fog(pixels,1.8,1.8,1.8)
+                        tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
+                        photoView.setImageBitmap(tmpImage)
+                    }
+                    6-> {
+                        pixels= blur(pixels)
+                        tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
+                        photoView.setImageBitmap(tmpImage)
+                    }
                 }
             }
         }
@@ -100,6 +111,122 @@ class FilterFragment : Fragment() {
             }*/
         tmpImage!!.getPixels(arr, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
         return arr // закинули в глобальный массив
+    }
+
+    fun fog(pxl : IntArray , red: Double, green: Double, blue: Double): IntArray{
+        // create output image
+        var matrix = pxl
+        // get image size
+        val width = tmpImage!!.width
+        val height = tmpImage!!.height
+        // color information
+        var A: Int
+        var R: Int
+        var G: Int
+        var B: Int
+        var pixel: Int
+        // constant value curve
+        val MAX_SIZE = 256
+        val MAX_VALUE_DBL = 255.0
+        val MAX_VALUE_INT = 255
+        val REVERSE = 1.0
+
+        // gamma arrays
+        val gammaR = IntArray(MAX_SIZE)
+        val gammaG = IntArray(MAX_SIZE)
+        val gammaB = IntArray(MAX_SIZE)
+
+        // setting values for every gamma channels
+        for (i in 0 until MAX_SIZE) {
+            gammaR[i] = Math.min(MAX_VALUE_INT,
+                    (MAX_VALUE_DBL * Math.pow(i / MAX_VALUE_DBL, REVERSE / red) + 0.5).toInt())
+            gammaG[i] = Math.min(MAX_VALUE_INT,
+                    (MAX_VALUE_DBL * Math.pow(i / MAX_VALUE_DBL, REVERSE / green) + 0.5).toInt())
+            gammaB[i] = Math.min(MAX_VALUE_INT,
+                    (MAX_VALUE_DBL * Math.pow(i / MAX_VALUE_DBL, REVERSE / blue) + 0.5).toInt())
+        }
+
+        // apply gamma table
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                // get pixel color
+                val color = matrix!![x * tmpImage!!.width + y]
+
+                A = Color.alpha(color)
+                // look up gamma
+                R = gammaR[Color.red(color)]
+                G = gammaG[Color.green(color)]
+                B = gammaB[Color.blue(color)]
+                // set new color to output bitmap
+                val p = A shl 24 or (R shl 16) or (G shl 8) or B
+                matrix[x * tmpImage!!.width + y] = p
+
+            }
+        }
+
+        // return final image
+        return matrix
+    }
+
+    fun blur(pxl: IntArray): IntArray {
+
+        val radius = 5
+        val SIZE = 2 * radius + 1
+        var sum = 0.0
+        var matrix = pxl
+        val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
+        val width = tmpImage!!.width
+        val height = tmpImage!!.height
+
+        var sumR: Double
+        var sumG: Double  // переменные для вычисления суммы цвета
+        var sumB: Double
+
+        var x1 = 0
+        var y1 = 0
+
+        for (x in -radius until radius) {
+            for (y in -radius until radius) {
+                weights[x1][y1] = (Math.pow(Math.E, (-((x * x + y * y) / (2 * radius * radius))).toDouble())) / (2 * Math.PI * radius * radius)
+                sum += weights[x1][y1]
+                y1++
+            }
+            y1 = 0
+            x1++
+        }
+
+        if (sum == 0.0)  // чтобы избежать деления на 0
+            sum = 1.0
+
+        for (y in 0 until height - SIZE + 1) {
+            for (x in 0 until width - SIZE + 1) {
+
+
+                sumB = 0.0
+                sumG = sumB
+                sumR = sumG
+
+                for (i in 0 until SIZE) {
+                    for (j in 0 until SIZE) {
+                        sumR += ((Color.red(matrix[x + i + width * (y + j)]) * weights[i][j]))
+                        sumG += ((Color.green(matrix[x + i + width * (y + j)]) * weights[i][j]))  // считаем сумму для цветов
+                        sumB += ((Color.blue(matrix[x + i + width * (y + j)]) * weights[i][j]))
+                    }
+                }
+
+                var R = (sumR / sum).toInt()
+                var B = (sumB / sum).toInt()
+                var G = (sumG / sum).toInt()
+                R = Math.max(0, Math.min(255, R))
+                G = Math.max(0, Math.min(255, G))
+                B = Math.max(0, Math.min(255, B))
+                val a = 255
+                val p = a shl 24 or (R shl 16) or (G shl 8) or B
+                matrix[y * tmpImage!!.width + x] = p
+
+            }
+        }
+        return matrix
     }
 
     fun bin(pxl : IntArray) : IntArray {
