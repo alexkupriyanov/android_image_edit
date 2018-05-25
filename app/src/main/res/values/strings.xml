@@ -19,5 +19,7 @@
         <item>Inverse</item>
         <item>Gray Scale</item>
         <item>Sepia</item>
+        <item>Fog</item>
+        <item>Blur</item>
     </string-array>
 </resources>

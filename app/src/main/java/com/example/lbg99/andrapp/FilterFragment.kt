@@ -9,8 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.Spinner
-import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_filter.*
 
 class FilterFragment : Fragment() {
@@ -87,6 +85,14 @@ class FilterFragment : Fragment() {
                         tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                         photoView.setImageBitmap(tmpImage)
                     }
+                   5-> {
+                       tmpImage = fog(tmpImage!!,1.8,1.8,1.8)
+                       photoView.setImageBitmap(tmpImage)
+                    }
+                    6-> {
+                        tmpImage = blur(pixels)
+                        photoView.setImageBitmap(tmpImage)
+                    }
                 }
             }
         }
@@ -94,10 +100,6 @@ class FilterFragment : Fragment() {
 
     fun getPixelsMatrix(tmpImage: Bitmap?): IntArray { //получает матрицу пикселей из bitmap (просто интовые байты)
         var arr = IntArray(tmpImage!!.width * tmpImage!!.height)
-        /*for(i in 0 until tmpImage!!.width)
-            for(j in 0 until tmpImage!!.height) {
-                arr[i][j]= tmpImage!!.getPixel(i, j)
-            }*/
         tmpImage!!.getPixels(arr, 0, tmpImage!!.width, 0, 0, tmpImage!!.width, tmpImage!!.height)
         return arr // закинули в глобальный массив
     }
@@ -197,6 +199,138 @@ class FilterFragment : Fragment() {
             }
         return matrix
     }
+
+    val COLOR_MIN = 0x00
+    val COLOR_MAX = 0xFF
+
+    fun fog(src: Bitmap, red: Double, green: Double, blue: Double): Bitmap {
+        // create output image
+        val bmOut = Bitmap.createBitmap(src.width, src.height, src.config)
+        // get image size
+        val width = src.width
+        val height = src.height
+        // color information
+        var A: Int
+        var R: Int
+        var G: Int
+        var B: Int
+        var pixel: Int
+        // constant value curve
+        val MAX_SIZE = 256
+        val MAX_VALUE_DBL = 255.0
+        val MAX_VALUE_INT = 255
+        val REVERSE = 1.0
+
+        // gamma arrays
+        val gammaR = IntArray(MAX_SIZE)
+        val gammaG = IntArray(MAX_SIZE)
+        val gammaB = IntArray(MAX_SIZE)
+
+        // setting values for every gamma channels
+        for (i in 0 until MAX_SIZE) {
+            gammaR[i] = Math.min(MAX_VALUE_INT,
+                    (MAX_VALUE_DBL * Math.pow(i / MAX_VALUE_DBL, REVERSE / red) + 0.5).toInt())
+            gammaG[i] = Math.min(MAX_VALUE_INT,
+                    (MAX_VALUE_DBL * Math.pow(i / MAX_VALUE_DBL, REVERSE / green) + 0.5).toInt())
+            gammaB[i] = Math.min(MAX_VALUE_INT,
+                    (MAX_VALUE_DBL * Math.pow(i / MAX_VALUE_DBL, REVERSE / blue) + 0.5).toInt())
+        }
+
+        // apply gamma table
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                // get pixel color
+                pixel = src.getPixel(x, y)
+                A = Color.alpha(pixel)
+                // look up gamma
+                R = gammaR[Color.red(pixel)]
+                G = gammaG[Color.green(pixel)]
+                B = gammaB[Color.blue(pixel)]
+                // set new color to output bitmap
+                bmOut.setPixel(x, y, Color.argb(A, R, G, B))
+            }
+        }
+
+        // return final image
+        return bmOut
+    }
+
+    fun blur(pxl: IntArray): Bitmap? {
+
+        val radius = 5
+        var src = commonData.imageBitmap
+        val SIZE = 2 * radius + 1
+        var sum = 0.0
+        var pixels = IntArray(src!!.width * src!!.height)
+        val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
+        val width = src.width
+        val height = src.height
+        src.getPixels(pixels, 0, width, 0, 0, width, height)
+        var sumR: Double
+        var sumG: Double  // переменные для вычисления суммы цвета
+        var sumB: Double
+
+        var x1 = 0
+        var y1 = 0
+        val result = Bitmap.createBitmap(width, height, src.config)
+
+        for (x in -radius until radius) {
+            for (y in -radius until radius) {
+                weights[x1][y1] = (Math.pow(Math.E, (-((x * x + y * y) / (2 * radius * radius))).toDouble())) / (2 * Math.PI * radius * radius)
+                // weigts[x1][y1] =(1 / (2 * PI * radius * radius)) * exp(-(x1 * x1 + y1 * y1) / (2 * radius * radius).toDouble())
+                sum += weights[x1][y1]
+                y1++
+            }
+            y1 = 0
+            x1++
+        }
+
+        if (sum == 0.0)  // чтобы избежать деления на 0
+            sum = 1.0
+
+        for (y in 0 until height - SIZE + 1) {
+            for (x in 0 until width - SIZE + 1) {
+
+
+                sumB = 0.0
+                sumG = sumB
+                sumR = sumG
+
+                for (i in 0 until SIZE) {
+                    for (j in 0 until SIZE) {
+                        sumR += ((Color.red(pixels[x + i + width * (y + j)]) * weights[i][j]))
+                        sumG += ((Color.green(pixels[x + i + width * (y + j)]) * weights[i][j]))  // считаем сумму для цветов
+                        sumB += ((Color.blue(pixels[x + i + width * (y + j)]) * weights[i][j]))
+                    }
+                }
+
+                var R = (sumR / sum).toInt()
+                if (R < 0) {
+                    R = 0
+                } else if (R > 255) {
+                    R = 255
+                }
+                // получаем итоговые цвета
+                var G = (sumG / sum).toInt()
+                if (G < 0) {
+                    G = 0
+                } else if (G > 255) {
+                    G = 255
+                }
+
+                var B = (sumB / sum).toInt()
+                if (B < 0) {
+                    B = 0
+                } else if (B > 255) {
+                    B = 255
+                }
+                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B))
+            }
+        }
+        return result
+    }
+
+
 
     override fun onResume() {
         super.onResume()
