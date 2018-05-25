@@ -105,6 +105,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:clickable="true"
+        app:backgroundTint="@color/SaddleBrown"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
@@ -116,6 +117,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="24dp"
         android:clickable="true"
+        app:backgroundTint="@color/Sienna"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_save" />
