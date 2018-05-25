@@ -86,11 +86,13 @@ class FilterFragment : Fragment() {
                         photoView.setImageBitmap(tmpImage)
                     }
                    5-> {
-                       tmpImage = fog(tmpImage!!,1.8,1.8,1.8)
+                       pixels= fog(pixels,1.8,1.8,1.8)
+                       tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                        photoView.setImageBitmap(tmpImage)
                     }
                     6-> {
-                        tmpImage = blur(pixels)
+                        pixels= blur(pixels)
+                        tmpImage = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.RGB_565)
                         photoView.setImageBitmap(tmpImage)
                     }
                 }
@@ -203,12 +205,12 @@ class FilterFragment : Fragment() {
     val COLOR_MIN = 0x00
     val COLOR_MAX = 0xFF
 
-    fun fog(src: Bitmap, red: Double, green: Double, blue: Double): Bitmap {
+    fun fog(pxl : IntArray , red: Double, green: Double, blue: Double): IntArray{
         // create output image
-        val bmOut = Bitmap.createBitmap(src.width, src.height, src.config)
+        var matrix = pxl
         // get image size
-        val width = src.width
-        val height = src.height
+        val width = tmpImage!!.width
+        val height = tmpImage!!.height
         // color information
         var A: Int
         var R: Int
@@ -240,39 +242,40 @@ class FilterFragment : Fragment() {
         for (x in 0 until width) {
             for (y in 0 until height) {
                 // get pixel color
-                pixel = src.getPixel(x, y)
-                A = Color.alpha(pixel)
+                val color = matrix!![x * tmpImage!!.width + y]
+
+                A = Color.alpha(color)
                 // look up gamma
-                R = gammaR[Color.red(pixel)]
-                G = gammaG[Color.green(pixel)]
-                B = gammaB[Color.blue(pixel)]
+                R = gammaR[Color.red(color)]
+                G = gammaG[Color.green(color)]
+                B = gammaB[Color.blue(color)]
                 // set new color to output bitmap
-                bmOut.setPixel(x, y, Color.argb(A, R, G, B))
+                val p = A shl 24 or (R shl 16) or (G shl 8) or B
+                matrix[x * tmpImage!!.width + y] = p
+
             }
         }
 
         // return final image
-        return bmOut
+        return matrix
     }
 
-    fun blur(pxl: IntArray): Bitmap? {
+    fun blur(pxl: IntArray): IntArray {
 
         val radius = 5
-        var src = commonData.imageBitmap
         val SIZE = 2 * radius + 1
         var sum = 0.0
-        var pixels = IntArray(src!!.width * src!!.height)
+        var matrix = pxl
         val weights = Array(SIZE) { DoubleArray(SIZE) } // матрица коэффициентов(весов)
-        val width = src.width
-        val height = src.height
-        src.getPixels(pixels, 0, width, 0, 0, width, height)
+        val width = tmpImage!!.width
+        val height = tmpImage!!.height
+
         var sumR: Double
         var sumG: Double  // переменные для вычисления суммы цвета
         var sumB: Double
 
         var x1 = 0
         var y1 = 0
-        val result = Bitmap.createBitmap(width, height, src.config)
 
         for (x in -radius until radius) {
             for (y in -radius until radius) {
@@ -298,9 +301,9 @@ class FilterFragment : Fragment() {
 
                 for (i in 0 until SIZE) {
                     for (j in 0 until SIZE) {
-                        sumR += ((Color.red(pixels[x + i + width * (y + j)]) * weights[i][j]))
-                        sumG += ((Color.green(pixels[x + i + width * (y + j)]) * weights[i][j]))  // считаем сумму для цветов
-                        sumB += ((Color.blue(pixels[x + i + width * (y + j)]) * weights[i][j]))
+                        sumR += ((Color.red(matrix[x + i + width * (y + j)]) * weights[i][j]))
+                        sumG += ((Color.green(matrix[x + i + width * (y + j)]) * weights[i][j]))  // считаем сумму для цветов
+                        sumB += ((Color.blue(matrix[x + i + width * (y + j)]) * weights[i][j]))
                     }
                 }
 
@@ -324,10 +327,13 @@ class FilterFragment : Fragment() {
                 } else if (B > 255) {
                     B = 255
                 }
-                result.setPixel(x + 1, y + 1, Color.argb(255, R, G, B))
+                val a = 255
+                val p = a shl 24 or (R shl 16) or (G shl 8) or B
+                matrix[y * tmpImage!!.width + x] = p
+
             }
         }
-        return result
+        return matrix
     }
 
 
