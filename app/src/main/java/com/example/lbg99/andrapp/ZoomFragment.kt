@@ -133,7 +133,7 @@ class ZoomFragment : Fragment() {
                         commentText.text = ""
                         triangl(coorX, coorY)
                         imageview.setImageBitmap(tmpImage)
-                        clear(number - 1, textViews)
+                        clear(number, textViews)
                     }
                 }
                 return true
