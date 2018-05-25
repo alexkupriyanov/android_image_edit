@@ -9,8 +9,10 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.SeekBar
 import com.example.lbg99.andrapp.R.id.*
@@ -22,6 +24,8 @@ class TurnFragment : Fragment() {
 
     var tmpImage : Bitmap? = null
     var tmpPreview : Bitmap? = null
+    var prevX: Double? = null
+    var prevY: Double? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -44,7 +48,8 @@ class TurnFragment : Fragment() {
 
         picker.setOnValueChangedListener(object : NumberPicker.OnValueChangeListener{
             override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
-                turnPreviewImage.setImageBitmap(Rotate(picker!!.value.toDouble(), tmpPreview))
+                tmpImage = Rotate(picker!!.value.toDouble(), commonData.imageBitmap)
+                turnView.setImageBitmap(tmpImage)
             }
         })
 
@@ -64,15 +69,9 @@ class TurnFragment : Fragment() {
             Log.i(">>>>>", "mBitmap.getHeight()=" + commonData.imageBitmap!!.height)
         }
 
-        doTurnBtn.setOnClickListener {
-           tmpImage = Rotate(picker.value.toDouble(), commonData.imageBitmap)
-            turnView.setImageBitmap(tmpImage)
-        }
-
         applyTurnBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
-        turnPreviewImage.setImageBitmap(tmpPreview)
         tmpImage = commonData.imageBitmap
         turnView.setImageBitmap(tmpImage)
 
@@ -106,9 +105,9 @@ class TurnFragment : Fragment() {
                 if (y > 0 && x > 0 && y < h - 2 && x < w - 2) {
                     //усреднение пикселей
                     pixelA = pixels[y * w + x]
-                    pixelB = pixels[y * w + (x + 1)]
+                    pixelB = pixels[y * w + x + 1]
                     pixelC = pixels[(y + 1) * w + x]
-                    pixelD = pixels[(y + 1) * w + (x + 1)]
+                    pixelD = pixels[(y + 1) * w + x + 1]
                     val R = (Color.red(pixelA) + Color.red(pixelB) + Color.red(pixelC) + Color.red(pixelD)) / 4
                     val G = (Color.green(pixelA) + Color.green(pixelB) + Color.green(pixelC) + Color.green(pixelD)) / 4
                     val B = (Color.blue(pixelA) + Color.blue(pixelB) + Color.blue(pixelC) + Color.blue(pixelD)) / 4
