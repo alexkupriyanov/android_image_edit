@@ -18,6 +18,7 @@ import android.widget.SeekBar
 import com.example.lbg99.andrapp.R.id.*
 import com.example.lbg99.andrapp.commonData.Companion.scaleFactor
 import kotlinx.android.synthetic.main.fragment_turn.*
+import kotlinx.android.synthetic.main.fragment_turn.view.*
 import kotlinx.android.synthetic.main.fragment_unsharp_masking.*
 
 class TurnFragment : Fragment() {
@@ -46,18 +47,6 @@ class TurnFragment : Fragment() {
         picker.minValue = 0
         picker.maxValue = 360
 
-        picker.setOnValueChangedListener(object : NumberPicker.OnValueChangeListener{
-            override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
-                turnPreviewImage.setImageBitmap(Rotate(picker!!.value.toDouble(), tmpPreview))
-
-            }
-        })
-
-        doTurnBtn.setOnClickListener {
-            tmpImage = Rotate(picker!!.value.toDouble(), commonData.imageBitmap)
-            turnView.setImageBitmap(tmpImage)
-        }
-
         val targetW = 100
         val targetH = 100
         val bmOptions = BitmapFactory.Options()
@@ -73,7 +62,24 @@ class TurnFragment : Fragment() {
             Log.i(">>>>>", "mBitmap.getWidth()=" + commonData.imageBitmap!!.width)
             Log.i(">>>>>", "mBitmap.getHeight()=" + commonData.imageBitmap!!.height)
         }
+        else {
+            tmpPreview = tmpImage
+        }
 
+        picker.setOnValueChangedListener(object : NumberPicker.OnValueChangeListener{
+            override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
+                turnPreviewImage.setImageBitmap(Rotate(picker!!.value.toDouble(), tmpPreview))
+
+            }
+        })
+
+        doTurnBtn.setOnClickListener {
+            tmpImage = Rotate(picker!!.value.toDouble(), commonData.imageBitmap)
+            turnView.setImageBitmap(tmpImage)
+        }
+
+
+        turnPreviewImage.setImageBitmap(tmpPreview)
         applyTurnBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }

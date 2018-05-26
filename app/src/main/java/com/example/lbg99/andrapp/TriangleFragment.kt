@@ -37,7 +37,7 @@ class TriangleFragment : Fragment() {
             commentText.text = ""
             clear(number, textViews)
         }
-
+        triangleView.setImageBitmap(tmpImage)
         applyTriangleBtn.setOnClickListener {
             commonData.imageBitmap = tmpImage
         }
