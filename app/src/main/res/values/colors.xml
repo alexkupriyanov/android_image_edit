@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#D2B48C</color>
+    <color name="colorPrimaryDark">#8B4513</color>
+    <color name="colorAccent">#8B4513</color>
     <color name="screenBackground">#FFF8E1</color>
     <color name="buttonBackground">#BBDEFB</color>
+    <color name="Bisque">#D2B48C</color>
+    <color name="SaddleBrown">#8B4513</color>
+    <color name ="Sienna">#A0522D</color>
     <color name="black">#000000</color>
 </resources>

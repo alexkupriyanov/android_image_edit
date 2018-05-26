@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="D:\Git\Photo\android_image_edit\openCVLibrary341\src\main\assets"/><source path="D:\Git\Photo\android_image_edit\openCVLibrary341\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="D:\Git\Photo\android_image_edit\openCVLibrary341\src\debug\assets"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="C:\android\project\android_image_edit\openCVLibrary341\src\main\assets"/><source path="C:\android\project\android_image_edit\openCVLibrary341\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="C:\android\project\android_image_edit\openCVLibrary341\src\debug\assets"/></dataSet></merger>
