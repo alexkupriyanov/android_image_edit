@@ -161,6 +161,12 @@ class nav_menu : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.retouch -> {
                 addFragmentToActivity(RetouchFragment())
             }
+            R.id.opencv -> {
+                addFragmentToActivity(OpencvFragment())
+            }
+            R.id.triangle -> {
+                addFragmentToActivity(TriangleFragment())
+            }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)

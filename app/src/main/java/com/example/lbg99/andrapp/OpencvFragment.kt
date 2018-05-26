@@ -14,9 +14,6 @@ import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
-import android.view.Window
-import android.view.WindowManager
-
 
 
 class OpencvFragment : Fragment() {
